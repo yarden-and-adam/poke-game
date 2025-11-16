@@ -3,6 +3,7 @@ import DraftScreen from './ui/DraftScreen'
 import BattleScreen from './ui/BattleScreen'
 import { Player, SimplePokemon } from './types'
 import { buildGameState } from './game/engine'
+import { useTheme } from './ThemeContext' // Import useTheme
 
 export default function App() {
   const [phase, setPhase] = useState<'start' | 'draft' | 'battle'>('start')
@@ -11,9 +12,13 @@ export default function App() {
   const [localP2, setLocalP2] = useState<Player | null>(null)
   const [gameState, setGameState] = useState<any | null>(null)
   const [unselectedPools, setUnselectedPools] = useState<[SimplePokemon[], SimplePokemon[]] | null>(null)
+  const { theme, toggleTheme } = useTheme() // Use the theme hook
 
   return (
     <div className="app">
+      <button onClick={toggleTheme} className="theme-toggle-button">
+        {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
+      </button>
       <h1>⚡ Pokémon Battle Arena ⚡</h1>
       {phase === 'start' && (
         <>

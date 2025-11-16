@@ -75,18 +75,11 @@ export default function DraftScreen({ onComplete }: DraftScreenProps) {
             <div style={{ marginBottom: '15px', fontSize: '1.1rem', fontWeight: '600', color: '#667eea' }}>
               Selected: {player.picks.length}/6
             </div>
-            <div className="pokemon-grid">
+            <div className="selected-pokemon-row">
               {player.picks.map(p => (
                 <div key={p.id} className="pokemon-card">
                   <img src={p.sprite} alt={p.name} />
                   <div className="pokemon-card-name">{p.name}</div>
-                  <div className="pokemon-types">
-                    {p.types.map(t => (
-                      <span key={t} className={`type-badge type-${t.toLowerCase()}`}>
-                        {t}
-                      </span>
-                    ))}
-                  </div>
                 </div>
               ))}
             </div>
