@@ -648,6 +648,7 @@ button:disabled {
   color: white;
   font-weight: bold;
   font-size: 0.8rem;
+  min-width: 10px; /* Ensure HP bar is always visible */
 }
 
 .hp-fill.warning { background-color: var(--warning-color); }

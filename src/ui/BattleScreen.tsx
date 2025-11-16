@@ -433,8 +433,8 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                         backgroundColor: 'rgba(255, 107, 107, 0.3)', 
                         borderLeft: '4px solid #ff6b6b' 
                       } : isNotVeryEffective ? {
-                        backgroundColor: 'rgba(100, 100, 100, 0.2)',
-                        borderLeft: '4px solid #666'
+                        backgroundColor: 'rgba(150, 150, 150, 0.3)', // Lighter background for dark mode
+                        borderLeft: '4px solid #999' // Lighter border for dark mode
                       } : {}
                     }
                   >
