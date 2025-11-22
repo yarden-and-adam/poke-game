@@ -1,0 +1,107 @@
+/* Type Indicator Styles */
+.type-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.type-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.type-emoji {
+  font-size: 1.1em;
+  animation: emoji-bounce 1s ease-in-out infinite;
+}
+
+.type-text {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Size variations */
+.type-indicator-small {
+  padding: 3px 6px;
+  font-size: var(--font-size-xs);
+}
+
+.type-indicator-medium {
+  padding: 4px 8px;
+  font-size: var(--font-size-sm);
+}
+
+.type-indicator-large {
+  padding: 6px 12px;
+  font-size: var(--font-size-md);
+}
+
+/* Effectiveness colors */
+.type-indicator[style*="color: var(--color-success)"] {
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.3);
+}
+
+.type-indicator[style*="color: var(--color-warning)"] {
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.3);
+}
+
+.type-indicator[style*="color: var(--color-text-secondary)"] {
+  box-shadow: 0 0 8px rgba(173, 181, 189, 0.3);
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes emoji-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-2px) scale(1.1); }
+}
+
+/* Hover effects */
+.type-indicator:hover {
+  transform: translateY(-1px) scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .type-indicator {
+    padding: 3px 6px;
+    font-size: var(--font-size-xs);
+  }
+  
+  .type-indicator-large {
+    padding: 4px 8px;
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .type-indicator {
+    padding: 2px 4px;
+    gap: 4px;
+  }
+  
+  .type-indicator-medium,
+  .type-indicator-large {
+    padding: 2px 6px;
+    font-size: var(--font-size-xs);
+  }
+}

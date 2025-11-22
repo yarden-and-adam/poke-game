@@ -1,0 +1,352 @@
+/* Battle Entry Animations */
+.battle-entry-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1001;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.battle-entry-content {
+  position: relative;
+  text-align: center;
+  animation: entry-entrance 1.8s ease-out;
+}
+
+.entry-pokemon-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 30px;
+}
+
+.entry-pokemon-sprite {
+  position: relative;
+  z-index: 3;
+  animation-duration: 1.6s;
+  animation-timing-function: ease-in-out;
+}
+
+.entry-aura {
+  position: absolute;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0.7;
+  z-index: 2;
+  animation: aura-pulse 1.6s ease-in-out;
+}
+
+.entry-name-announcement {
+  position: relative;
+  z-index: 4;
+}
+
+.entry-pokemon-name {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+  margin-bottom: 10px;
+  animation: name-appear 1.6s ease-out;
+}
+
+.entry-types {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  animation: types-appear 1.6s ease-out 0.3s both;
+}
+
+.entry-type-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.entry-effects {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.entry-light-beam {
+  position: absolute;
+  width: 2px;
+  height: 100vh;
+  background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.8), transparent);
+  top: -50vh;
+  opacity: 0;
+  animation: beam-sweep 1.6s ease-out;
+}
+
+.beam-1 {
+  left: 20%;
+  transform: rotate(-15deg);
+}
+
+.beam-2 {
+  left: 40%;
+  transform: rotate(-5deg);
+}
+
+.beam-3 {
+  left: 60%;
+  transform: rotate(5deg);
+}
+
+.beam-4 {
+  left: 80%;
+  transform: rotate(15deg);
+}
+
+.entry-particles {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.entry-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: particle-orbit 1.6s ease-out;
+}
+
+.entry-shockwave {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  animation: shockwave-expand 1.6s ease-out;
+}
+
+/* Entry Animations */
+@keyframes entry-entrance {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes entry-dramatic-appear {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    transform: scale(0.5) rotate(90deg);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 1;
+  }
+  75% {
+    transform: scale(1.2) rotate(270deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes entry-impact {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes entry-pose {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-5deg);
+  }
+  75% {
+    transform: translateY(-5px) rotate(5deg);
+  }
+}
+
+@keyframes entry-ready {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes entry-complete {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes aura-pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes name-appear {
+  0% {
+    transform: translateY(50px) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes types-appear {
+  0% {
+    transform: translateY(30px) scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes beam-sweep {
+  0% {
+    opacity: 0;
+    transform: rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes particle-orbit {
+  0% {
+    transform: rotate(0deg) translateX(0) scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: rotate(180deg) translateX(60px) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(360deg) translateX(100px) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes shockwave-expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .entry-pokemon-name {
+    font-size: 2rem;
+  }
+  
+  .entry-type-badge {
+    padding: 4px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .entry-pokemon-sprite img {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .entry-aura {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-width: 480px) {
+  .entry-pokemon-name {
+    font-size: 1.5rem;
+  }
+  
+  .entry-type-badge {
+    padding: 3px 8px;
+    font-size: 0.7rem;
+  }
+  
+  .entry-pokemon-sprite img {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .entry-aura {
+    width: 100px;
+    height: 100px;
+  }
+}

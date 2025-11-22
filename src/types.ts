@@ -1,5 +1,9 @@
 export type DamageClass = 'physical' | 'special' | 'status'
 
+export type Weather = 'clear' | 'sunny' | 'rainy' | 'stormy'
+
+export type StatusCondition = 'burn' | 'poison' | 'sleep' | 'freeze' | 'paralyze' | null
+
 export interface SimpleMove {
   id: number
   name: string
@@ -46,21 +50,13 @@ export interface Card {
   id: string
   name: string
   description: string
-  type: 'heal' | 'revive' | 'shield' | 'boost' | 'draw' | 'evolve' | 'reinforcements'
-  value?: number
+  type: 'heal' | 'revive' | 'shield' | 'boost' | 'draw' | 'evolve' | 'reinforcements' | 'type_master'
+  value?: number | string
 }
 
 export interface DeckState {
   cards: Card[]
   discard: Card[]
-}
-
-export interface Card {
-  id: string
-  name: string
-  description: string
-  type: 'heal' | 'revive' | 'shield' | 'boost' | 'draw' | 'evolve' | 'reinforcements'
-  value?: number
 }
 
 export interface DeckState {
@@ -75,7 +71,8 @@ export type ActionType =
   | { kind: 'block' }
   | { kind: 'use_card'; cardId: string; targetBenchIndex?: number }
   | { kind: 'reinforcements' }
-  | { kind: 'evolve'; targetPokemonName: string; benchIndex: number }
+  | { kind: 'evolve'; targetPokemonName: string; benchIndex: number; cardId?: string }
+  | { kind: 'super_move' }
 
 export interface PokemonState {
   pokemon: SimplePokemon
@@ -84,6 +81,11 @@ export interface PokemonState {
   fainted: boolean
   shielded?: boolean
   boostedAtkTurns?: number
+  status?: StatusCondition
+  statusTurnsRemaining?: number
+  friendship: number
+  timesUsed: number
+  stats: SimplePokemon['stats']
 }
 
 export interface PlayerState {
@@ -94,12 +96,17 @@ export interface PlayerState {
   activeIndex: number
   hand: Card[]
   points: number
+  comboType: string | null
+  comboCount: number
+  superMoveGauge: number
 }
 
 export interface GameState {
   players: [PlayerState, PlayerState]
   deck: DeckState
   turnNumber: number
+  weather: Weather
+  weatherTurnsRemaining: number
   gameOver?: boolean
   winnerIndex?: number | null
 }

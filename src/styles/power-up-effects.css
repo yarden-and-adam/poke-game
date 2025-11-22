@@ -1,0 +1,213 @@
+/* Power-Up Visual Effects */
+.power-up-effect {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.power-up-content {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.power-up-aura {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: aura-pulse 1.2s ease-in-out;
+}
+
+.power-up-emoji {
+  position: relative;
+  font-size: 2.5rem;
+  z-index: 2;
+  animation: emoji-bounce 1.2s ease-in-out;
+}
+
+.power-up-particles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  animation: particle-fly 1.2s ease-out forwards;
+}
+
+/* Power-Up Animations */
+@keyframes power-up-appear {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+@keyframes power-up-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+@keyframes power-up-burst {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1.2);
+  }
+}
+
+@keyframes power-up-spiral {
+  0% {
+    transform: rotate(0deg) scale(1.2);
+  }
+  100% {
+    transform: rotate(720deg) scale(1);
+  }
+}
+
+@keyframes power-up-fade {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes aura-pulse {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes emoji-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes particle-fly {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: translate(calc(-50% + 30px), calc(-50% - 30px)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+/* Type-specific variations */
+.power-up-content.fire .power-up-aura {
+  background: radial-gradient(circle, rgba(255, 107, 53, 0.8), rgba(255, 107, 53, 0.2));
+  box-shadow: 0 0 40px rgba(255, 107, 53, 0.8);
+}
+
+.power-up-content.water .power-up-aura {
+  background: radial-gradient(circle, rgba(79, 195, 247, 0.8), rgba(79, 195, 247, 0.2));
+  box-shadow: 0 0 40px rgba(79, 195, 247, 0.8);
+}
+
+.power-up-content.electric .power-up-aura {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.8), rgba(255, 215, 0, 0.2));
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.8);
+}
+
+.power-up-content.grass .power-up-aura {
+  background: radial-gradient(circle, rgba(102, 187, 106, 0.8), rgba(102, 187, 106, 0.2));
+  box-shadow: 0 0 40px rgba(102, 187, 106, 0.8);
+}
+
+.power-up-content.psychic .power-up-aura {
+  background: radial-gradient(circle, rgba(186, 104, 200, 0.8), rgba(186, 104, 200, 0.2));
+  box-shadow: 0 0 40px rgba(186, 104, 200, 0.8);
+}
+
+.power-up-content.ice .power-up-aura {
+  background: radial-gradient(circle, rgba(179, 229, 252, 0.8), rgba(179, 229, 252, 0.2));
+  box-shadow: 0 0 40px rgba(179, 229, 252, 0.8);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .power-up-content {
+    width: 60px;
+    height: 60px;
+  }
+  
+  .power-up-emoji {
+    font-size: 2rem;
+  }
+  
+  .particle {
+    width: 4px;
+    height: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .power-up-content {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .power-up-emoji {
+    font-size: 1.5rem;
+  }
+  
+  .particle {
+    width: 3px;
+    height: 3px;
+  }
+}

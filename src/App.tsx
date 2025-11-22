@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
 import DraftScreen from './ui/DraftScreen'
 import BattleScreen from './ui/BattleScreen'
+import ThemeSelector from './ui/ThemeSelector'
+import ThemeEffects from './ui/ThemeEffects'
 import { Player, SimplePokemon } from './types'
 import { buildGameState } from './game/engine'
 import { useTheme } from './ThemeContext' // Import useTheme
@@ -12,13 +14,17 @@ export default function App() {
   const [localP2, setLocalP2] = useState<Player | null>(null)
   const [gameState, setGameState] = useState<any | null>(null)
   const [unselectedPools, setUnselectedPools] = useState<[SimplePokemon[], SimplePokemon[]] | null>(null)
-  const { theme, toggleTheme } = useTheme() // Use the theme hook
+  const { theme, themeName, toggleTheme } = useTheme() // Use the theme hook
 
   return (
-    <div className="app">
-      <button onClick={toggleTheme} className="theme-toggle-button">
-        {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
-      </button>
+    <div className={`app theme-${themeName.toLowerCase()}`}>
+      <ThemeEffects themeId={themeName.toLowerCase()} />
+      <div className="theme-controls">
+        <button onClick={toggleTheme} className="theme-toggle-button">
+          {themeName === 'Dark' ? '☀️' : '🌙'}
+        </button>
+        <ThemeSelector />
+      </div>
       <h1>⚡ Pokémon Battle Arena ⚡</h1>
       {phase === 'start' && (
         <>

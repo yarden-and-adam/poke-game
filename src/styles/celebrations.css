@@ -1,0 +1,376 @@
+/* Celebration Overlay Styles */
+.celebration-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.celebration-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  animation: fade-in 0.3s ease-out;
+}
+
+.celebration-content {
+  position: relative;
+  z-index: 10;
+  padding: 20px 40px;
+  border-radius: 20px;
+  font-weight: 700;
+  text-align: center;
+  animation: celebration-bounce 1.4s ease-out;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.celebration-emoji {
+  font-size: 4rem;
+  margin-bottom: 10px;
+  animation: emoji-spin 0.6s ease-in-out;
+  text-shadow: 0 0 20px currentColor;
+}
+
+.celebration-text {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  animation: text-glow 1.4s ease-out;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.celebration-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.celebration-particle {
+  position: absolute;
+  font-size: 2rem;
+  animation: particle-float 2s ease-out forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.celebration-flash {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Critical Hit Celebration */
+.celebration-critical {
+  background: linear-gradient(135deg, #ffd700, #ff6b6b);
+  animation: critical-shake 0.6s ease-out;
+}
+
+.celebration-flash-critical {
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, transparent 70%);
+  animation: critical-flash 0.8s ease-out;
+}
+
+/* KO Celebration */
+.celebration-ko {
+  background: linear-gradient(135deg, #ff6b6b, #c92a2a);
+  animation: ko-explosion 1.2s ease-out;
+}
+
+.celebration-flash-ko {
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.4) 0%, transparent 70%);
+  animation: ko-flash 1s ease-out;
+}
+
+/* Super Move Celebration */
+.celebration-super-move {
+  background: linear-gradient(135deg, #9333ea, #ec4899);
+  animation: super-move-burst 1.6s ease-out;
+}
+
+.celebration-flash-super-move {
+  background: radial-gradient(circle, rgba(147, 51, 234, 0.4) 0%, transparent 70%);
+  animation: super-move-flash 1.2s ease-out;
+}
+
+/* Victory Celebration */
+.celebration-victory {
+  background: linear-gradient(135deg, #10b981, #3b82f6);
+  animation: victory-burst 2s ease-out;
+}
+
+.celebration-flash-victory {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, transparent 70%);
+  animation: victory-flash 1.5s ease-out;
+}
+
+/* Animations */
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes celebration-bounce {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  20% { transform: scale(1.3) rotate(5deg); opacity: 1; }
+  40% { transform: scale(0.9) rotate(-3deg); opacity: 1; }
+  60% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+  80% { transform: scale(1) rotate(-1deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 0; }
+}
+
+@keyframes emoji-spin {
+  0% { transform: rotate(0deg) scale(0.5); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+@keyframes text-glow {
+  0% { text-shadow: 0 0 10px rgba(0, 0, 0, 0.8); }
+  50% { text-shadow: 0 0 25px currentColor, 0 0 40px currentColor; }
+  100% { text-shadow: 0 0 10px rgba(0, 0, 0, 0.8); }
+}
+
+@keyframes particle-float {
+  0% { 
+    transform: translateY(0) rotate(0deg) scale(0); 
+    opacity: 0; 
+  }
+  20% { 
+    transform: translateY(-20px) rotate(90deg) scale(1); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: translateY(-100px) rotate(360deg) scale(0.5); 
+    opacity: 0; 
+  }
+}
+
+@keyframes critical-shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes critical-flash {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes ko-explosion {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  25% { transform: scale(1.4) rotate(90deg); opacity: 1; }
+  50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+  75% { transform: scale(0.9) rotate(270deg); opacity: 0.8; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+@keyframes ko-flash {
+  0% { opacity: 0; }
+  30% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes super-move-burst {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  25% { transform: scale(1.5) rotate(180deg); opacity: 1; }
+  50% { transform: scale(1.2) rotate(360deg); opacity: 1; }
+  75% { transform: scale(1) rotate(540deg); opacity: 0.8; }
+  100% { transform: scale(0) rotate(720deg); opacity: 0; }
+}
+
+@keyframes super-move-flash {
+  0% { opacity: 0; }
+  40% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes victory-burst {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  30% { transform: scale(1.6) rotate(180deg); opacity: 1; }
+  60% { transform: scale(1.3) rotate(360deg); opacity: 1; }
+  100% { transform: scale(0) rotate(540deg); opacity: 0; }
+}
+
+@keyframes victory-flash {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Victory Special Effects */
+.victory-confetti {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -10px;
+  animation: confetti-fall 3s ease-out forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.victory-fireworks {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.firework {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #FFD700;
+  border-radius: 50%;
+  animation: firework-launch 1.5s ease-out forwards;
+}
+
+.firework-explosion {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  top: -30px;
+  left: -30px;
+  animation: firework-explode 1s ease-out forwards;
+}
+
+.firework-spark {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  animation: spark-fly 1s ease-out forwards;
+}
+
+@keyframes firework-launch {
+  0% {
+    transform: translateY(100vh) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes firework-explode {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes spark-fly {
+  0% {
+    transform: rotate(var(--rotation)) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(var(--rotation)) translateX(40px);
+    opacity: 0;
+  }
+}
+
+.victory-stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.victory-star {
+  position: absolute;
+  animation: star-twinkle 2s ease-in-out infinite;
+}
+
+@keyframes star-twinkle {
+  0%, 100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .celebration-content {
+    padding: 15px 30px;
+  }
+  
+  .celebration-emoji {
+    font-size: 3rem;
+  }
+  
+  .celebration-text {
+    font-size: 2rem;
+  }
+  
+  .celebration-particle {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .celebration-content {
+    padding: 10px 20px;
+  }
+  
+  .celebration-emoji {
+    font-size: 2.5rem;
+  }
+  
+  .celebration-text {
+    font-size: 1.5rem;
+  }
+}

@@ -1,4 +1,4 @@
-import { SimplePokemon, SimpleMove, TypeChart } from '../types'
+import { SimplePokemon, SimpleMove, TypeChart, Weather } from '../types'
 
 function getTypeMultiplier(attackType: string, defenderTypes: string[], typeChart: TypeChart) {
   let multiplier = 1
@@ -21,6 +21,7 @@ export function calculateDamage(
   defender: SimplePokemon,
   move: SimpleMove,
   typeChart: TypeChart,
+  weather: Weather = 'clear',
   level = 50
 ) {
   const power = move.power || 0
@@ -37,9 +38,23 @@ export function calculateDamage(
   // critical chance (simple)
   const crit = Math.random() < 0.0625 ? 1.5 : 1
   const randF = rand(0.85, 1)
-  const modifier = stab * typeEff * crit * randF
+  
+  // Weather modifiers
+  let weatherMod = 1
+  if (weather === 'sunny') {
+    if (move.type === 'fire') weatherMod = 1.2
+    if (move.type === 'water') weatherMod = 0.8
+  } else if (weather === 'rainy') {
+    if (move.type === 'water') weatherMod = 1.2
+    if (move.type === 'fire') weatherMod = 0.8
+  } else if (weather === 'stormy') {
+    if (move.type === 'electric') weatherMod = 1.3
+  }
+  
+  const modifier = stab * typeEff * crit * randF * weatherMod
   const dmg = Math.max(1, Math.floor(base * modifier))
-  return { damage: dmg, details: { stab, typeEff, crit, randF } }
+  const isCritical = crit > 1
+  return { damage: dmg, details: { stab, typeEff, crit, randF, weatherMod, isCritical } }
 }
 
 export function accuracyCheck(move: SimpleMove) {

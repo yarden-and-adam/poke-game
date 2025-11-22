@@ -3,8 +3,6 @@ import { Player, SimplePokemon, SimpleMove, GameState, ActionType, TypeChart } f
 import { calculateDamage, accuracyCheck, dodgeCheck, blockDamage } from '../game/battleEngine'
 import { fetchTypeChart } from '../services/pokeapi'
 import { resolveTurn } from '../game/engine'
-import PowerUpEffect from './PowerUpEffect'
-import BattleEntryAnimation from './BattleEntryAnimation'
 
 interface BattleScreenProps {
   initialState: GameState
@@ -24,19 +22,6 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
   const [lastLogs, setLastLogs] = useState<string[]>([])
   const [showEvolutionModal, setShowEvolutionModal] = useState<boolean>(false)
   const [playerEvolving, setPlayerEvolving] = useState<number | null>(null)
-  
-  // Power-up effects state
-  const [powerUpEffects, setPowerUpEffects] = useState<Array<{
-    id: string
-    type: string
-    position: { x: number, y: number }
-  }>>([])
-
-  // Battle entry animation state
-  const [battleEntry, setBattleEntry] = useState<{
-    visible: boolean
-    pokemon: SimplePokemon | null
-  }>({ visible: false, pokemon: null })
 
   useEffect(() => {
     fetchTypeChart().then(chart => {
@@ -64,26 +49,6 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
     return 'action'
   }
 
-  // Trigger power-up effect
-  function triggerPowerUpEffect(type: string, targetElement: HTMLElement) {
-    const rect = targetElement.getBoundingClientRect()
-    const id = Math.random().toString(36)
-    
-    setPowerUpEffects(prev => [...prev, {
-      id,
-      type,
-      position: { 
-        x: rect.left + rect.width / 2, 
-        y: rect.top + rect.height / 2 
-      }
-    }])
-    
-    // Auto-remove after animation
-    setTimeout(() => {
-      setPowerUpEffects(prev => prev.filter(effect => effect.id !== id))
-    }, 1500)
-  }
-
   async function nextTurn() {
     if (actions[0] === null || actions[1] === null) {
       alert('Both players must select an action!')
@@ -108,12 +73,24 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
   function useCard(pIdx: number, cardIdx: number) {
     const card = state.players[pIdx].hand[cardIdx]
     if (!card) return
-    pickAction(pIdx, { kind: 'use_card', cardId: card.id })
-    setSelectedCardIdx(prev => {
-      const copy: any = [...prev]
-      copy[pIdx] = cardIdx
-      return [copy[0], copy[1]]
-    })
+    
+    if (card.type === 'evolve') {
+      // Show evolution modal instead of using card immediately
+      setPlayerEvolving(pIdx)
+      setShowEvolutionModal(true)
+      setSelectedCardIdx(prev => {
+        const copy: any = [...prev]
+        copy[pIdx] = cardIdx
+        return [copy[0], copy[1]]
+      })
+    } else {
+      pickAction(pIdx, { kind: 'use_card', cardId: card.id })
+      setSelectedCardIdx(prev => {
+        const copy: any = [...prev]
+        copy[pIdx] = cardIdx
+        return [copy[0], copy[1]]
+      })
+    }
     setShowCardMenu(prev => {
       const copy: any = [...prev]
       copy[pIdx] = false
@@ -173,21 +150,18 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
         </div>
         
         {rewardPokemon && winnerIdx >= 0 && (
-          <div style={{
-            background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
-            padding: '20px',
-            borderRadius: '8px',
-            margin: '20px auto',
-            maxWidth: '300px',
-            textAlign: 'center',
-            border: '3px solid #ffa500'
-          }}>
+            <div style={{
+              background: 'var(--color-surface)',
+              padding: '15px',
+              borderRadius: '8px',
+              border: '2px solid var(--color-warning)'
+            }}>
             <div style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '10px' }}>🏆 Prize Pokémon!</div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '15px' }}>
               <img src={rewardPokemon.sprite} alt={rewardPokemon.name} style={{ width: '80px', height: '80px' }} />
               <div style={{ textAlign: 'left' }}>
-                <div style={{ fontSize: '1.1rem', fontWeight: '600', color: '#333' }}>{rewardPokemon.name}</div>
-                <div style={{ fontSize: '0.85rem', color: '#555' }}>
+                <div style={{ fontSize: '1.1rem', fontWeight: '600', color: 'var(--color-text)' }}>{rewardPokemon.name}</div>
+                <div style={{ fontSize: '0.85rem', color: 'var(--color-text-secondary)' }}>
                   {rewardPokemon.types.map(t => (
                     <span key={t} className={`type-badge type-${t.toLowerCase()}`} style={{ marginRight: '4px', display: 'inline-block' }}>
                       {t}
@@ -215,7 +189,7 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
               border: `2px solid ${state.winnerIndex === idx ? '#ffd700' : '#ddd'}`
             }}>
               <div style={{ fontWeight: '600', marginBottom: '10px' }}>{p.name}</div>
-              <div style={{ fontSize: '0.9rem', color: '#666' }}>
+              <div style={{ fontSize: '0.9rem', color: 'var(--color-text-secondary)' }}>
                 <div>⭐ <strong>{p.points}</strong> Points</div>
                 <div>💪 <strong>{p.bench.filter(pk => !pk.fainted).length}</strong> Pokémon Left</div>
                 <div>❤️ <strong>{Math.max(0, Math.floor(p.bench.reduce((sum, pk) => sum + (pk.fainted ? 0 : pk.currentHp), 0)))}</strong> Total HP</div>
@@ -224,7 +198,7 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
           ))}
         </div>
 
-        <div style={{ color: '#999', fontSize: '0.9rem', marginTop: '20px' }}>
+        <div style={{ color: 'var(--color-text-secondary)', fontSize: '0.9rem', marginTop: '20px' }}>
           Battle lasted <strong>{totalTurns}</strong> turn{totalTurns !== 1 ? 's' : ''}
         </div>
 
@@ -267,7 +241,7 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
           const hasSelectedAction = actions[i] !== null
 
           return (
-            <div key={p.id} className="battle-player" style={{ borderLeft: hasSelectedAction ? '4px solid #4caf50' : '4px solid #ddd' }}>
+            <div key={p.id} className="battle-player" style={{ borderLeft: hasSelectedAction ? '4px solid var(--color-success)' : '4px solid var(--color-border)' }}>
               <h3>
                 {p.name}
                 {hasSelectedAction && <span className="status-indicator status-ready">✓ Ready</span>}
@@ -325,7 +299,7 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                       pickAction(i, { kind: 'switch', benchIndex: p.bench.indexOf(availableSwitches[0]) })
                     }}
                     disabled={active.fainted || p.bench.filter((_, idx) => idx !== p.activeIndex && !p.bench[idx].fainted).length === 0}
-                    style={{ background: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)' }}
+                    style={{ background: 'linear-gradient(135deg, var(--color-primary) 0%, #7b1fa2 100%)' }}
                   >
                     🔄 Switch
                   </button>
@@ -354,6 +328,16 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                         onClick={() => useCard(i, cidx)}
                         title={card.description}
                       >
+                        <div className="card-emoji">
+                          {card.type === 'heal' && '💚'}
+                          {card.type === 'revive' && '⚕️'}
+                          {card.type === 'shield' && '🛡️'}
+                          {card.type === 'boost' && '⚡'}
+                          {card.type === 'draw' && '🎴'}
+                          {card.type === 'type_master' && '🎯'}
+                          {card.type === 'evolve' && '⭐'}
+                          {card.type === 'reinforcements' && '📢'}
+                        </div>
                         <div className="card-name">{card.name}</div>
                         <div className="card-type">{card.type}</div>
                       </div>
@@ -409,7 +393,7 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                 <div className="bench-pokemon">
                   {p.bench.map((pp, idx) => (
                     <div
-                      key={pp.pokemon.id}
+                      key={`${pp.pokemon.id}-${idx}`}
                       className={`bench-pokemon-card ${idx === p.activeIndex ? 'active' : ''} ${pp.fainted ? 'fainted' : ''}`}
                       onClick={() => {
                         if (idx !== p.activeIndex && !pp.fainted) {
@@ -466,10 +450,10 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                     style={
                       isSuperEffective ? { 
                         backgroundColor: 'rgba(255, 107, 107, 0.3)', 
-                        borderLeft: '4px solid #ff6b6b' 
+                        borderLeft: '4px solid var(--color-danger)' 
                       } : isNotVeryEffective ? {
                         backgroundColor: 'rgba(150, 150, 150, 0.3)', // Lighter background for dark mode
-                        borderLeft: '4px solid #999' // Lighter border for dark mode
+                        borderLeft: '4px solid var(--color-text-secondary)' // Lighter border for dark mode
                       } : {}
                     }
                   >
@@ -482,7 +466,7 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
               {state.players.map((p, idx) => (
                 <div key={p.id} style={{
-                  background: '#f8f9fa',
+                  background: 'var(--color-surface)',
                   padding: '12px',
                   borderRadius: '8px',
                   fontSize: '0.9rem'
@@ -503,23 +487,72 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
         </div>
       )}
 
+      {showEvolutionModal && playerEvolving !== null && (
+        <div className="help-modal">
+          <div className="help-content" style={{ maxWidth: '500px' }}>
+            <h2>Choose a Pokémon to Evolve</h2>
+            <div style={{ marginBottom: '20px' }}>
+              <p>Select a Pokémon from your bench that can evolve:</p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px' }}>
+              {state.players[playerEvolving].bench.map((pokemon, idx) => {
+                const canEvolve = pokemon.pokemon.evolutions && pokemon.pokemon.evolutions.length > 0 && !pokemon.fainted
+                return (
+                  <div
+                    key={idx}
+                    onClick={() => {
+                      if (canEvolve) {
+                        const evolution = pokemon.pokemon.evolutions![0]
+                        const cardIdx = selectedCardIdx[playerEvolving]
+                        const cardId = cardIdx !== null ? state.players[playerEvolving].hand[cardIdx].id : undefined
+                        pickAction(playerEvolving, { 
+                          kind: 'evolve', 
+                          targetPokemonName: evolution.name, 
+                          benchIndex: idx,
+                          cardId
+                        })
+                        setShowEvolutionModal(false)
+                        setPlayerEvolving(null)
+                      }
+                    }}
+                    style={{
+                      cursor: canEvolve ? 'pointer' : 'not-allowed',
+                      opacity: canEvolve ? 1 : 0.5,
+                      border: canEvolve ? '2px solid var(--color-success)' : '2px solid var(--color-border)',
+                      padding: '10px',
+                      borderRadius: '8px',
+                      textAlign: 'center'
+                    }}
+                  >
+                    <img src={pokemon.pokemon.sprite} alt={pokemon.pokemon.name} style={{ width: '60px', height: '60px' }} />
+                    <div style={{ fontSize: '0.9rem', fontWeight: '600', marginTop: '5px' }}>{pokemon.pokemon.name}</div>
+                    {canEvolve && (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--color-success)', marginTop: '5px' }}>
+                        → {pokemon.pokemon.evolutions![0].name}
+                      </div>
+                    )}
+                    {!canEvolve && (
+                      <div style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '5px' }}>
+                        Cannot evolve
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            <button
+              onClick={() => {
+                setShowEvolutionModal(false)
+                setPlayerEvolving(null)
+              }}
+              style={{ width: '100%', padding: '12px' }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
-      {/* Power-up effects */}
-      {powerUpEffects.map(effect => (
-        <PowerUpEffect
-          key={effect.id}
-          visible={true}
-          type={effect.type as any}
-          position={effect.position}
-        />
-      ))}
-      
-      {/* Battle entry animations */}
-      <BattleEntryAnimation
-        visible={battleEntry.visible}
-        pokemon={battleEntry.pokemon}
-        onComplete={() => setBattleEntry({ visible: false, pokemon: null })}
-      />
     </div>
   )
 }

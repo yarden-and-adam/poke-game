@@ -35,12 +35,33 @@ export function createDeck(): DeckState {
   for (let i = 0; i < 8; i++) {
     cards.push({ id: `draw_${i}`, name: 'Draw', description: 'Draw one extra card', type: 'draw' })
   }
-  // Evolve x10
-  for (let i = 0; i < 10; i++) {
-    cards.push({ id: `evolve_${i}`, name: 'Evolve', description: 'Evolve a Pokemon to its next form', type: 'evolve' })
+  
+  // Type Master Cards x12 (2 for each type)
+  const types = ['fire', 'water', 'grass', 'electric', 'psychic', 'ice']
+  for (let i = 0; i < types.length; i++) {
+    for (let j = 0; j < 2; j++) {
+      const type = types[i]
+      cards.push({ 
+        id: `master_${type}_${j}`, 
+        name: `${type.charAt(0).toUpperCase() + type.slice(1)} Master`, 
+        description: `${type.charAt(0).toUpperCase() + type.slice(1)} moves do +25% damage for 3 turns`, 
+        type: 'type_master',
+        value: type 
+      })
+    }
   }
 
-  // total: 12 + 6 + 6 + 10 + 8 + 8 + 10 = 60
+  // Evolution Cards x4
+  for (let i = 0; i < 4; i++) {
+    cards.push({ id: `evolve_${i}`, name: 'Evolution Stone', description: 'Evolve a Pokémon to its next form', type: 'evolve' })
+  }
+
+  // Reinforcements Cards x3
+  for (let i = 0; i < 3; i++) {
+    cards.push({ id: `reinforcements_${i}`, name: 'Reinforcements', description: 'Call a random Pokémon from your pool', type: 'reinforcements' })
+  }
+
+  // total: 12 + 6 + 6 + 10 + 8 + 8 + 10 + 12 + 4 + 3 = 79
 
   shuffle(cards)
   return { cards, discard: [] }

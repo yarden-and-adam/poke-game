@@ -40,6 +40,16 @@ export default function DraftScreen({ onComplete }: DraftScreenProps) {
     })
   }
 
+  function unpickPokemon(playerIdx: number, pokemonId: number) {
+    setPlayers(prev => {
+      const result = [...prev]
+      const player = result[playerIdx]
+      const newPicks = player.picks.filter(p => p.id !== pokemonId)
+      result[playerIdx] = { ...player, picks: newPicks }
+      return result
+    })
+  }
+
   function isPicked(playerIdx: number, pokemonId: number): boolean {
     return players[playerIdx].picks.some(p => p.id === pokemonId)
   }
@@ -56,7 +66,7 @@ export default function DraftScreen({ onComplete }: DraftScreenProps) {
 
   return (
     <div>
-      <h2 style={{ color: 'white', textAlign: 'center', marginBottom: '30px' }}>⚔️ Draft Your Team</h2>
+      <h2 style={{ color: 'var(--color-text)', textAlign: 'center', marginBottom: '30px' }}>⚔️ Draft Your Team</h2>
       <div className="draft-container">
         {players.map((player, playerIdx) => (
           <div key={player.id} className="player-section">
@@ -72,19 +82,26 @@ export default function DraftScreen({ onComplete }: DraftScreenProps) {
                 aria-label={`Player ${playerIdx + 1} Name`}
               />
             </h3>
-            <div style={{ marginBottom: '15px', fontSize: '1.1rem', fontWeight: '600', color: '#667eea' }}>
+            <div style={{ marginBottom: '15px', fontSize: '1.1rem', fontWeight: '600', color: 'var(--color-primary)' }}>
               Selected: {player.picks.length}/6
             </div>
             <div className="selected-pokemon-row">
               {player.picks.map(p => (
-                <div key={p.id} className="pokemon-card">
+                <div key={p.id} className="bench-pokemon-card">
                   <img src={p.sprite} alt={p.name} />
-                  <div className="pokemon-card-name">{p.name}</div>
+                  <div className="bench-pokemon-types">
+                    {p.types.map((t: string) => (
+                      <span key={t} className={`type-badge-small type-${t.toLowerCase()}`} title={t}>
+                        {t.charAt(0).toUpperCase()}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="bench-pokemon-name">{p.name}</div>
                 </div>
               ))}
             </div>
 
-            <h4 style={{ marginTop: '20px', color: '#666' }}>Available for {playerIdx === 0 ? player1Name : player2Name}</h4>
+            <h4 style={{ marginTop: '20px', color: 'var(--color-text-secondary)' }}>Available for {playerIdx === 0 ? player1Name : player2Name}</h4>
             <div className="pokemon-pool-grid">
               {pools[playerIdx].map((p: SimplePokemon) => (
                 <div
@@ -108,6 +125,15 @@ export default function DraftScreen({ onComplete }: DraftScreenProps) {
                   >
                     {isPicked(playerIdx, p.id) ? '✓ Picked' : 'Pick'}
                   </button>
+                  {isPicked(playerIdx, p.id) && (
+                    <button
+                      className="unpick-button"
+                      onClick={() => unpickPokemon(playerIdx, p.id)}
+                      style={{ marginLeft: '5px' }}
+                    >
+                      ✕ Unpick
+                    </button>
+                  )}
                 </div>
               ))}
             </div>

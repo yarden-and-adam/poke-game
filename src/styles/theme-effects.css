@@ -1,0 +1,428 @@
+/* Theme Visual Effects */
+
+/* Snow Effect for Christmas Theme */
+.theme-christmas .snow-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.theme-christmas .snowflake {
+  position: absolute;
+  top: -10px;
+  color: white;
+  font-size: 1em;
+  animation: snowfall linear infinite;
+}
+
+@keyframes snowfall {
+  0% {
+    top: -10px;
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    top: 100vh;
+    transform: translateX(100px) rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
+/* Enhanced Hanukkah Theme Effects */
+.theme-hanukkah .menorah-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+  animation: menorah-glow 3s ease-in-out infinite;
+}
+
+@keyframes menorah-glow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.6)); }
+}
+
+.theme-hanukkah .menorah-candle {
+  width: 12px;
+  height: 30px;
+  background: linear-gradient(to bottom, #e8e8e8 0%, #c0c0c0 50%, #808080 100%);
+  border-radius: 2px;
+  position: relative;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-hanukkah .menorah-candle::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 4px;
+  background: #ffd700;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
+}
+
+.theme-hanukkah .menorah-flame {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10px;
+  height: 16px;
+  background: radial-gradient(circle, #fff 0%, #ffd700 30%, #ff8c00 70%, transparent 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  animation: flame-dance 1.5s ease-in-out infinite;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
+.theme-hanukkah .menorah-flame::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 6px;
+  background: radial-gradient(circle, #fff 0%, transparent 70%);
+  border-radius: 50%;
+  animation: inner-flame 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes flame-dance {
+  0%, 100% { 
+    transform: translateX(-50%) scale(1) rotate(-2deg); 
+    opacity: 1; 
+  }
+  25% { 
+    transform: translateX(-50%) scale(1.1) rotate(1deg); 
+    opacity: 0.9; 
+  }
+  50% { 
+    transform: translateX(-50%) scale(0.95) rotate(2deg); 
+    opacity: 1; 
+  }
+  75% { 
+    transform: translateX(-50%) scale(1.05) rotate(-1deg); 
+    opacity: 0.95; 
+  }
+}
+
+@keyframes inner-flame {
+  0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+  100% { transform: translateX(-50%) scale(1.2); opacity: 1; }
+}
+
+/* Dreidel spinning effect */
+.theme-hanukkah .dreidel-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.theme-hanukkah .dreidel {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: dreidel-spin 4s linear infinite;
+  opacity: 0.6;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes dreidel-spin {
+  0% { 
+    transform: rotate(0deg) translateY(0); 
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.6;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  100% { 
+    transform: rotate(720deg) translateY(100vh); 
+    opacity: 0;
+  }
+}
+
+/* Star of David sparkles */
+.theme-hanukkah .star-sparkle {
+  position: absolute;
+  color: #ffd700;
+  font-size: 1rem;
+  animation: sparkle-twinkle 3s ease-in-out infinite;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+@keyframes sparkle-twinkle {
+  0%, 100% { 
+    transform: scale(0) rotate(0deg); 
+    opacity: 0;
+  }
+  50% { 
+    transform: scale(1) rotate(180deg); 
+    opacity: 1;
+  }
+}
+
+/* Floating gelt coins */
+.theme-hanukkah .gelt-coin {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #ffd700 0%, #ffb347 70%, #ff8c00 100%);
+  border-radius: 50%;
+  border: 2px solid #b8860b;
+  animation: gelt-float 8s ease-in-out infinite;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  color: #8b4513;
+}
+
+.theme-hanukkah .gelt-coin::after {
+  content: '₪';
+}
+
+@keyframes gelt-float {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg); 
+    opacity: 0.7;
+  }
+  25% { 
+    transform: translateY(-15px) rotate(90deg); 
+    opacity: 0.9;
+  }
+  50% { 
+    transform: translateY(-5px) rotate(180deg); 
+    opacity: 0.8;
+  }
+  75% { 
+    transform: translateY(-20px) rotate(270deg); 
+    opacity: 0.9;
+  }
+}
+
+/* Pumpkin and Spider Effects for Halloween Theme */
+.theme-halloween .halloween-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.theme-halloween .pumpkin {
+  position: absolute;
+  font-size: 2rem;
+  animation: float 6s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+.theme-halloween .spider {
+  position: absolute;
+  font-size: 1.5rem;
+  animation: spider-descend 8s ease-in-out infinite;
+  opacity: 0.6;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+@keyframes spider-descend {
+  0% { top: -50px; opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { top: 100vh; opacity: 0; }
+}
+
+/* Falling Leaves Effect for Autumn Themes */
+.theme-autumn .leaves-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.theme-autumn .leaf {
+  position: absolute;
+  top: -20px;
+  font-size: 1.5rem;
+  animation: leaf-fall linear infinite;
+  opacity: 0.8;
+}
+
+@keyframes leaf-fall {
+  0% {
+    top: -20px;
+    transform: translateX(0) rotate(0deg);
+    opacity: 0.8;
+  }
+  25% {
+    transform: translateX(50px) rotate(90deg);
+  }
+  50% {
+    transform: translateX(-30px) rotate(180deg);
+  }
+  75% {
+    transform: translateX(80px) rotate(270deg);
+  }
+  100% {
+    top: 100vh;
+    transform: translateX(0) rotate(360deg);
+    opacity: 0.3;
+  }
+}
+
+/* Special Theme Button Effects */
+.theme-christmas button:hover {
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.theme-hanukkah button:hover {
+  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+  transform: translateY(-2px);
+}
+
+.theme-hanukkah button:active {
+  transform: translateY(0);
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+}
+
+.theme-halloween button:hover {
+  box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+}
+
+/* Theme-specific background patterns */
+.theme-christmas .app {
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(220, 20, 60, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(34, 139, 34, 0.1) 0%, transparent 50%),
+    var(--color-bg);
+}
+
+.theme-hanukkah .app {
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(100, 149, 237, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(192, 192, 192, 0.05) 0%, transparent 70%),
+    linear-gradient(45deg, rgba(100, 149, 237, 0.03) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(100, 149, 237, 0.03) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(100, 149, 237, 0.03) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(100, 149, 237, 0.03) 75%),
+    var(--color-bg);
+  background-size: 300px 300px, 250px 250px, 200px 200px, 20px 20px, 20px 20px, 20px 20px, 20px 20px, 100% 100%;
+  background-position: 0% 0%, 100% 100%, 50% 50%, 0 0, 0 10px, 10px -10px, -10px 0px, 0 0;
+  animation: hanukkah-shimmer 10s ease-in-out infinite;
+}
+
+@keyframes hanukkah-shimmer {
+  0%, 100% { background-position: 0% 0%, 100% 100%, 50% 50%, 0 0, 0 10px, 10px -10px, -10px 0px, 0 0; }
+  50% { background-position: 10% 10%, 90% 90%, 50% 60%, 10px 10px, 10px 20px, 20px 0px, 0px 10px, 0 0; }
+}
+
+.theme-halloween .app {
+  background-image: 
+    radial-gradient(circle at 15% 15%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 85% 85%, rgba(147, 51, 234, 0.1) 0%, transparent 50%),
+    var(--color-bg);
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 768px) {
+  .theme-halloween .pumpkin {
+    font-size: 1.5rem;
+  }
+  
+  .theme-halloween .spider {
+    font-size: 1.2rem;
+  }
+  
+  .theme-autumn .leaf {
+    font-size: 1.2rem;
+  }
+  
+  .theme-hanukkah .menorah-container {
+    gap: 6px;
+    top: 15px;
+  }
+  
+  .theme-hanukkah .menorah-candle {
+    width: 10px;
+    height: 25px;
+  }
+  
+  .theme-hanukkah .menorah-flame {
+    width: 8px;
+    height: 12px;
+    top: -10px;
+  }
+  
+  .theme-hanukkah .dreidel {
+    font-size: 1.2rem;
+  }
+  
+  .theme-hanukkah .gelt-coin {
+    width: 16px;
+    height: 16px;
+    font-size: 8px;
+  }
+  
+  .theme-hanukkah .star-sparkle {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .theme-hanukkah .menorah-container {
+    gap: 4px;
+    top: 10px;
+  }
+  
+  .theme-hanukkah .menorah-candle {
+    width: 8px;
+    height: 20px;
+  }
+  
+  .theme-hanukkah .menorah-flame {
+    width: 6px;
+    height: 10px;
+    top: -8px;
+  }
+  
+  .theme-hanukkah .dreidel {
+    font-size: 1rem;
+  }
+  
+  .theme-hanukkah .gelt-coin {
+    width: 14px;
+    height: 14px;
+    font-size: 7px;
+  }
+}
