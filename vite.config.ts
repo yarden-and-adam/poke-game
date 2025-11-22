@@ -92,7 +92,22 @@ export default defineConfig({
             purpose: 'maskable'
           }
         ],
-        screenshots: [],
+        screenshots: [
+          {
+            src: 'screenshot-start.png',
+            sizes: '1512x982',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Start screen with theme selector'
+          },
+          {
+            src: 'screenshot-draft.png',
+            sizes: '1512x982',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'Draft your team of Pokémon'
+          }
+        ],
         shortcuts: [
           {
             name: 'Start Battle',
