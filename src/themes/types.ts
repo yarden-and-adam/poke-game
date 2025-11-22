@@ -6,17 +6,38 @@ export interface ThemeColors {
   text: string
   textSecondary: string
   border: string
-  
+
   // Semantic colors
   primary: string
   success: string
   warning: string
   danger: string
   info: string
-  
+
+  // Battle & Game Effects
+  critical: string        // Critical hit color
+  superEffective: string  // Super effective attack
+  notEffective: string    // Not very effective
+  immune: string          // Immune/no effect
+  heal: string           // Healing effects
+  dodge: string          // Dodge/miss effects
+  block: string          // Block/defend effects
+
+  // Status Conditions
+  burn: string
+  poison: string
+  paralysis: string
+  freeze: string
+  sleep: string
+
+  // Super Gauge
+  gaugeEmpty: string
+  gaugeFilling: string
+  gaugeFull: string
+
   // Pokémon type colors (can be overridden per theme)
   typeColors: Record<string, string>
-  
+
   // Special theme colors
   accent?: string
   festive?: string

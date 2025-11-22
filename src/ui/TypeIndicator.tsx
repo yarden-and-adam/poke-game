@@ -6,28 +6,28 @@ interface TypeIndicatorProps {
   size?: 'small' | 'medium' | 'large'
 }
 
-export default function TypeIndicator({ 
-  effectiveness, 
-  showEmoji, 
-  size = 'medium' 
+export default function TypeIndicator({
+  effectiveness,
+  showEmoji,
+  size = 'medium'
 }: TypeIndicatorProps) {
   const configs = {
     super: {
       emoji: '💥',
       color: 'var(--color-success)',
-      text: 'Super!',
+      text: '+',
       bgColor: 'rgba(16, 185, 129, 0.2)'
     },
     'not-very': {
       emoji: '💨',
       color: 'var(--color-warning)',
-      text: 'Not much!',
+      text: '-',
       bgColor: 'rgba(245, 158, 11, 0.2)'
     },
     immune: {
       emoji: '🛡️',
       color: 'var(--color-text-secondary)',
-      text: 'No effect!',
+      text: '--',
       bgColor: 'rgba(173, 181, 189, 0.2)'
     },
     normal: {
@@ -37,14 +37,14 @@ export default function TypeIndicator({
       bgColor: 'transparent'
     }
   }
-  
+
   const config = configs[effectiveness]
   const sizeClasses = {
     small: 'type-indicator-small',
     medium: 'type-indicator-medium',
     large: 'type-indicator-large'
   }
-  
+
   return (
     <div className={`type-indicator ${sizeClasses[size]}`} style={{
       backgroundColor: config.bgColor,

@@ -24,84 +24,146 @@ const baseTypeColors = {
 
 export const lightTheme: ThemeConfig = {
   id: 'light',
-  name: 'Light',
-  description: 'Clean and bright light theme',
+  name: 'Daylight',
+  description: 'Bright and energetic',
   category: 'base',
   colors: {
-    background: '#f8f9fa',
-    surface: '#ffffff',
+    background: '#e0e7ff',
+    surface: '#f8fafc',
     card: '#ffffff',
-    text: '#212529',
-    textSecondary: '#6c757d',
-    border: '#dee2e6',
-    
-    primary: '#667eea',
-    success: '#28a745',
-    warning: '#ffc107',
-    danger: '#dc3545',
-    info: '#17a2b8',
-    
+    text: '#1e293b',
+    textSecondary: '#64748b',
+    border: '#cbd5e1',
+
+    primary: '#6366f1',
+    success: '#10b981',
+    warning: '#f59e0b',
+    danger: '#ef4444',
+    info: '#06b6d4',
+
+    // Battle & Game Effects
+    critical: '#dc2626',
+    superEffective: '#10b981',
+    notEffective: '#94a3b8',
+    immune: '#71717a',
+    heal: '#22c55e',
+    dodge: '#3b82f6',
+    block: '#9ca3af',
+
+    // Status Conditions
+    burn: '#f97316',
+    poison: '#a855f7',
+    paralysis: '#fbbf24',
+    freeze: '#06b6d4',
+    sleep: '#64748b',
+
+    // Super Gauge
+    gaugeEmpty: '#cbd5e1',
+    gaugeFilling: '#fbbf24',
+    gaugeFull: '#dc2626',
+
     typeColors: { ...baseTypeColors },
-    
-    accent: '#667eea'
+
+    accent: '#ec4899'
   }
 }
 
 export const darkTheme: ThemeConfig = {
   id: 'dark',
-  name: 'Dark',
-  description: 'Dark theme with purple accents',
+  name: 'Midnight',
+  description: 'Deep and mysterious',
   category: 'base',
   colors: {
-    background: '#0f0f0f',
-    surface: '#1a1a1a',
-    card: '#242424',
-    text: '#f8f9fa',
-    textSecondary: '#d1d5db',
-    border: '#404040',
-    
-    primary: '#8b5cf6',
+    background: '#1e293b',
+    surface: '#334155',
+    card: '#475569',
+    text: '#ffffff',
+    textSecondary: '#e2e8f0',
+    border: '#64748b',
+
+    primary: '#818cf8',
     success: '#34d399',
     warning: '#fbbf24',
-    danger: '#f87171',
-    info: '#60a5fa',
-    
+    danger: '#fb7185',
+    info: '#22d3ee',
+
+    // Battle & Game Effects
+    critical: '#f43f5e',
+    superEffective: '#4ade80',
+    notEffective: '#94a3b8',
+    immune: '#71717a',
+    heal: '#34d399',
+    dodge: '#60a5fa',
+    block: '#9ca3af',
+
+    // Status Conditions
+    burn: '#fb923c',
+    poison: '#c084fc',
+    paralysis: '#fde047',
+    freeze: '#22d3ee',
+    sleep: '#94a3b8',
+
+    // Super Gauge
+    gaugeEmpty: '#475569',
+    gaugeFilling: '#fbbf24',
+    gaugeFull: '#f43f5e',
+
     typeColors: { ...baseTypeColors },
-    
-    accent: '#8b5cf6'
+
+    accent: '#c084fc'
   }
 }
 
 export const hanukkahTheme: ThemeConfig = {
   id: 'hanukkah',
-  name: 'Hanukkah',
-  description: 'Festival of Lights theme with blue and silver colors',
+  name: 'Festival of Lights',
+  description: 'Glowing blue and silver',
   category: 'seasonal',
   colors: {
-    background: '#0a1929',
-    surface: '#1e3a5f',
-    card: '#2d4a7c',
-    text: '#e8f4fd',
-    textSecondary: '#b8d4f1',
-    border: '#4a7ba7',
-    
-    primary: '#6495ed',
-    success: '#90ee90',
-    warning: '#ffd700',
-    danger: '#dc143c',
-    info: '#87ceeb',
-    
+    background: '#082f49',
+    surface: '#0c4a6e',
+    card: '#075985',
+    text: '#f0f9ff',
+    textSecondary: '#bae6fd',
+    border: '#0ea5e9',
+
+    primary: '#38bdf8',
+    success: '#4ade80',
+    warning: '#fcd34d',
+    danger: '#f87171',
+    info: '#7dd3fc',
+
+    // Battle & Game Effects
+    critical: '#fcd34d',
+    superEffective: '#7dd3fc',
+    notEffective: '#0c4a6e',
+    immune: '#082f49',
+    heal: '#bae6fd',
+    dodge: '#38bdf8',
+    block: '#e0f2fe',
+
+    // Status Conditions
+    burn: '#fbbf24',
+    poison: '#a78bfa',
+    paralysis: '#fde047',
+    freeze: '#7dd3fc',
+    sleep: '#64748b',
+
+    // Super Gauge
+    gaugeEmpty: '#0c4a6e',
+    gaugeFilling: '#38bdf8',
+    gaugeFull: '#fcd34d',
+
     typeColors: {
       ...baseTypeColors,
-      fire: '#ff8c69', // Warmer fire for contrast
-      water: '#4dabf7', // Brighter blue
-      grass: '#51cf66', // Brighter green
-      electric: '#ffd43b', // Brighter yellow
-      ice: '#74c0fc', // Lighter ice
+      fire: '#fbbf24',
+      water: '#38bdf8',
+      electric: '#fcd34d',
+      ice: '#e0f2fe',
     },
-    
-    accent: '#c0c0c0', // Silver
-    festive: '#ffd700', // Gold
+
+    accent: '#e0f2fe',
+    festive: '#fcd34d',
   },
   animations: {
     buttonHover: 'glow-blue',
@@ -117,33 +179,54 @@ export const hanukkahTheme: ThemeConfig = {
 
 export const christmasTheme: ThemeConfig = {
   id: 'christmas',
-  name: 'Christmas',
-  description: 'Holiday theme with red, green, and gold colors',
+  name: 'Holiday Cheer',
+  description: 'Festive red and green',
   category: 'seasonal',
   colors: {
-    background: '#0f4c2a',
-    surface: '#1a5c3a',
-    card: '#2d6a4f',
-    text: '#f0f8f0',
-    textSecondary: '#b8d4b8',
-    border: '#4a7c59',
-    
-    primary: '#dc143c',
-    success: '#228b22',
-    warning: '#ffd700',
-    danger: '#8b0000',
-    info: '#4682b4',
-    
+    background: '#14532d',
+    surface: '#166534',
+    card: '#15803d',
+    text: '#f0fdf4',
+    textSecondary: '#bbf7d0',
+    border: '#22c55e',
+
+    primary: '#dc2626',
+    success: '#22c55e',
+    warning: '#fbbf24',
+    danger: '#dc2626',
+    info: '#3b82f6',
+
+    // Battle & Game Effects
+    critical: '#dc2626',
+    superEffective: '#4ade80',
+    notEffective: '#166534',
+    immune: '#14532d',
+    heal: '#a7f3d0',
+    dodge: '#60a5fa',
+    block: '#d1fae5',
+
+    // Status Conditions
+    burn: '#f97316',
+    poison: '#a855f7',
+    paralysis: '#fde047',
+    freeze: '#7dd3fc',
+    sleep: '#6b7280',
+
+    // Super Gauge
+    gaugeEmpty: '#166534',
+    gaugeFilling: '#fbbf24',
+    gaugeFull: '#dc2626',
+
     typeColors: {
       ...baseTypeColors,
-      grass: '#228b22', // Christmas green
-      ice: '#f0f8ff', // Snow white
-      fire: '#dc143c', // Christmas red
-      water: '#4682b4', // Steel blue
+      grass: '#22c55e',
+      ice: '#dbeafe',
+      fire: '#dc2626',
+      water: '#60a5fa',
     },
-    
-    accent: '#ffd700', // Gold
-    festive: '#dc143c', // Christmas red
+
+    accent: '#fbbf24',
+    festive: '#dc2626',
   },
   animations: {
     buttonHover: 'glow-red',
@@ -159,34 +242,55 @@ export const christmasTheme: ThemeConfig = {
 
 export const halloweenTheme: ThemeConfig = {
   id: 'halloween',
-  name: 'Halloween',
-  description: 'Spooky theme with orange, black, and purple colors',
+  name: 'Spooky Night',
+  description: 'Eerie purple and orange',
   category: 'seasonal',
   colors: {
-    background: '#1a0033',
-    surface: '#2d1a4d',
-    card: '#402966',
-    text: '#f0e6ff',
-    textSecondary: '#b8a3d9',
-    border: '#6b46c1',
-    
-    primary: '#ff6b35',
-    success: '#9333ea',
-    warning: '#f59e0b',
-    danger: '#dc2626',
-    info: '#8b5cf6',
-    
+    background: '#3b0764',
+    surface: '#581c87',
+    card: '#6b21a8',
+    text: '#faf5ff',
+    textSecondary: '#e9d5ff',
+    border: '#a855f7',
+
+    primary: '#fb923c',
+    success: '#a855f7',
+    warning: '#fbbf24',
+    danger: '#f43f5e',
+    info: '#c084fc',
+
+    // Battle & Game Effects
+    critical: '#fb923c',
+    superEffective: '#c084fc',
+    notEffective: '#581c87',
+    immune: '#3b0764',
+    heal: '#e879f9',
+    dodge: '#818cf8',
+    block: '#d8b4fe',
+
+    // Status Conditions
+    burn: '#f97316',
+    poison: '#e879f9',
+    paralysis: '#fde047',
+    freeze: '#60a5fa',
+    sleep: '#71717a',
+
+    // Super Gauge
+    gaugeEmpty: '#581c87',
+    gaugeFilling: '#fb923c',
+    gaugeFull: '#c084fc',
+
     typeColors: {
       ...baseTypeColors,
-      ghost: '#9333ea', // Brighter purple
-      dark: '#1f2937', // Darker
-      poison: '#a855f7', // Brighter poison
-      psychic: '#ec4899', // Brighter psychic
-      fire: '#ff6b35', // Orange fire
+      ghost: '#c084fc',
+      dark: '#27272a',
+      poison: '#e879f9',
+      psychic: '#f0abfc',
+      fire: '#fb923c',
     },
-    
-    accent: '#ff6b35', // Orange
-    festive: '#9333ea', // Purple
+
+    accent: '#fb923c',
+    festive: '#c084fc',
   },
   animations: {
     buttonHover: 'glow-orange',

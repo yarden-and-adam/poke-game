@@ -1,0 +1,423 @@
+/* Draft Screen Styles */
+
+.draft-screen-container {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: var(--spacing-md);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.draft-title {
+    text-align: center;
+    color: var(--color-text);
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-lg);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.draft-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    flex: 1;
+}
+
+@media (min-width: 1024px) {
+    .draft-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.draft-player-section {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.draft-player-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: var(--spacing-md);
+}
+
+.player-name-input {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 4px 8px;
+    transition: all 0.2s;
+    width: 200px;
+}
+
+.player-name-input:focus {
+    outline: none;
+    border-bottom-color: var(--color-primary);
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.draft-counter {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: var(--color-border);
+    color: var(--color-text-secondary);
+}
+
+.draft-counter.complete {
+    background: var(--color-success);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+/* Selected Team Section */
+.selected-team-container {
+    background: var(--color-card);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border: 2px dashed var(--color-border);
+}
+
+.selected-team-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    margin-bottom: var(--spacing-md);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.selected-team-slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+}
+
+@media (min-width: 600px) {
+    .selected-team-slots {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+.team-slot {
+    aspect-ratio: 1;
+    background: var(--color-surface);
+    border: 2px solid var(--color-border);
+    border-radius: var(--radius-md);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.team-slot.filled {
+    border-color: var(--color-primary);
+    background: linear-gradient(135deg, rgba(var(--color-primary), 0.1), var(--color-surface));
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.team-slot.empty {
+    border-style: dashed;
+    opacity: 0.7;
+}
+
+.empty-slot-indicator {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-border);
+}
+
+.slot-sprite {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.1));
+}
+
+.slot-name {
+    position: absolute;
+    bottom: 2px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 4px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+}
+
+.remove-pick-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-danger);
+    color: white;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.8);
+    transition: all 0.2s;
+    z-index: 2;
+}
+
+.team-slot:hover .remove-pick-btn {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Available Pool Section */
+.available-pool-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.pool-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: var(--spacing-md);
+}
+
+.pokemon-pool-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: var(--spacing-sm);
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.pool-card {
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.pool-card:hover:not(.picked) {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+}
+
+.pool-card.picked {
+    opacity: 0.5;
+    cursor: default;
+    filter: grayscale(100%);
+}
+
+.pool-card-inner {
+    padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.pool-sprite {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+}
+
+.pool-info {
+    text-align: center;
+    width: 100%;
+}
+
+.pool-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pool-types {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+}
+
+.type-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.picked-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--color-success);
+    font-weight: 800;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Start Game Bar */
+.start-game-bar {
+    position: sticky;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: var(--spacing-md);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+}
+
+.start-battle-btn {
+    padding: 16px 48px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    border-radius: 50px;
+    border: none;
+    background: var(--color-border);
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.start-battle-btn.ready {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(var(--color-primary), 0.4);
+    transform: translateY(-2px);
+}
+
+.start-battle-btn.ready:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(var(--color-primary), 0.5);
+}
+
+.start-battle-btn.ready:active {
+    transform: translateY(-1px);
+}
+
+/* Pokéball Loader */
+.pokeball-loader {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.pokeball {
+    width: 80px;
+    height: 80px;
+    position: relative;
+    animation: pokeball-bounce 0.8s ease-in-out infinite;
+}
+
+.pokeball-top {
+    width: 100%;
+    height: 50%;
+    background: var(--theme-danger, #dc2626);
+    border-radius: 40px 40px 0 0;
+    position: absolute;
+    top: 0;
+    border-bottom: 3px solid var(--theme-text, #1a1a1a);
+}
+
+.pokeball-bottom {
+    width: 100%;
+    height: 50%;
+    background: var(--theme-card, #ffffff);
+    border-radius: 0 0 40px 40px;
+    position: absolute;
+    bottom: 0;
+    border-top: 3px solid var(--theme-text, #1a1a1a);
+}
+
+.pokeball-middle {
+    width: 100%;
+    height: 8px;
+    background: var(--theme-text, #1a1a1a);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.pokeball-button {
+    width: 24px;
+    height: 24px;
+    background: var(--theme-card, #ffffff);
+    border: 3px solid var(--theme-text, #1a1a1a);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    box-shadow: inset 0 0 0 3px var(--theme-border, #cbd5e1);
+}
+
+@keyframes pokeball-bounce {
+
+    0%,
+    100% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    25% {
+        transform: translateY(-20px) rotate(-10deg);
+    }
+
+    50% {
+        transform: translateY(0) rotate(0deg);
+    }
+
+    75% {
+        transform: translateY(-20px) rotate(10deg);
+    }
+}

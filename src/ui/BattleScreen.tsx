@@ -5,6 +5,9 @@ import { fetchTypeChart } from '../services/pokeapi'
 import { resolveTurn } from '../game/engine'
 import PowerUpEffect from './PowerUpEffect'
 import BattleEntryAnimation from './BattleEntryAnimation'
+import WeatherOverlay from './WeatherOverlay'
+import ActionPopup from './ActionPopup'
+import { BattleEvent } from '../types'
 
 interface BattleScreenProps {
   initialState: GameState
@@ -24,7 +27,7 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
   const [lastLogs, setLastLogs] = useState<string[]>([])
   const [showEvolutionModal, setShowEvolutionModal] = useState<boolean>(false)
   const [playerEvolving, setPlayerEvolving] = useState<number | null>(null)
-  
+
   // Power-up effects state
   const [powerUpEffects, setPowerUpEffects] = useState<Array<{
     id: string
@@ -37,6 +40,9 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
     visible: boolean
     pokemon: SimplePokemon | null
   }>({ visible: false, pokemon: null })
+
+  const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([])
+  const [currentEvent, setCurrentEvent] = useState<BattleEvent | null>(null)
 
   useEffect(() => {
     fetchTypeChart().then(chart => {
@@ -68,16 +74,16 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
   function triggerPowerUpEffect(type: string, targetElement: HTMLElement) {
     const rect = targetElement.getBoundingClientRect()
     const id = Math.random().toString(36)
-    
+
     setPowerUpEffects(prev => [...prev, {
       id,
       type,
-      position: { 
-        x: rect.left + rect.width / 2, 
-        y: rect.top + rect.height / 2 
+      position: {
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2
       }
     }])
-    
+
     // Auto-remove after animation
     setTimeout(() => {
       setPowerUpEffects(prev => prev.filter(effect => effect.id !== id))
@@ -91,15 +97,41 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
     }
     const r = await resolveTurn(state, actions, typeChart)
     const newState = r.newState
-    
+
     // Store logs and show modal
     setLastLogs(r.logs)
-    setShowResult(true)
-    
+
+    // Queue events
+    if (r.events && r.events.length > 0) {
+      setBattleEvents(r.events)
+      setCurrentEvent(r.events[0])
+    } else {
+      setShowResult(true)
+    }
+
     setState(newState)
     for (const l of r.logs) logAdd(l)
     setActions([null, null])
   }
+
+  useEffect(() => {
+    if (currentEvent) {
+      // Auto-advance events
+      const timer = setTimeout(() => {
+        setBattleEvents(prev => {
+          const next = prev.slice(1)
+          if (next.length > 0) {
+            setCurrentEvent(next[0])
+          } else {
+            setCurrentEvent(null)
+            setShowResult(true)
+          }
+          return next
+        })
+      }, 2000)
+      return () => clearTimeout(timer)
+    }
+  }, [currentEvent])
 
   function continueAfterResult() {
     setShowResult(false)
@@ -142,13 +174,24 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
   function getEffectivenessEmoji(eff: string) {
     switch (eff) {
       case 'super-effective':
-        return '💥'
+        return '++'
       case 'not-very-effective':
-        return '💨'
+        return '-'
       case 'immune':
-        return '🛡️'
+        return '--'
       default:
-        return ''
+        return '+'
+    }
+  }
+
+  function getStatusIcon(status: string | null | undefined) {
+    switch (status) {
+      case 'burn': return '🔥'
+      case 'poison': return '☠️'
+      case 'sleep': return '💤'
+      case 'freeze': return '❄️'
+      case 'paralyze': return '⚡'
+      default: return ''
     }
   }
 
@@ -157,21 +200,21 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
     const winnerIdx = state.winnerIndex ?? -1
     const winner = winnerIdx >= 0 ? state.players[winnerIdx] : null
     const totalTurns = state.turnNumber
-    
+
     // Award random Pokémon from unselected pool to winner
     let rewardPokemon: SimplePokemon | null = null
     if (winnerIdx >= 0 && unselectedPools && unselectedPools[winnerIdx] && unselectedPools[winnerIdx].length > 0) {
       const pool = unselectedPools[winnerIdx]
       rewardPokemon = pool[Math.floor(Math.random() * pool.length)]
     }
-    
+
     return (
       <div className="game-over-screen">
         <h2>🎉 Battle Complete! 🎉</h2>
         <div className="winner">
           {state.winnerIndex === null || state.winnerIndex === undefined ? "It's a Tie!" : `${winner?.name} Wins!`}
         </div>
-        
+
         {rewardPokemon && winnerIdx >= 0 && (
           <div style={{
             background: 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)',
@@ -198,10 +241,10 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
             </div>
           </div>
         )}
-        
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: '1fr 1fr', 
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
           gap: '20px',
           width: '100%',
           maxWidth: '400px',
@@ -247,19 +290,46 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
   }
 
   return (
-    <div>
-      <h2 style={{ color: 'white', textAlign: 'center', marginBottom: '20px' }}>⚡ Battle in Progress (Turn {state.turnNumber}) ⚡</h2>
+    <div className="battle-screen-container">
+      <WeatherOverlay weather={state.weather} />
 
-      <div className="battle-control">
-        <button className="next-turn-button" onClick={nextTurn}>
-          ⚡ Resolve Turn ⚡
-        </button>
-        <button className="exit-button" onClick={onExit}>
-          Exit Battle
+      {currentEvent && (
+        <ActionPopup
+          message={currentEvent.message}
+          type={currentEvent.type as any}
+          onComplete={() => { }}
+        />
+      )}
+
+      <h2 style={{ color: 'var(--color-text)', textAlign: 'center', marginBottom: '10px', fontSize: '1.5rem' }}>
+        ⚡ Turn {state.turnNumber} ⚡
+      </h2>
+
+      {/* FIGHT BUTTON - TOP CENTER */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 'var(--spacing-md)' }}>
+        <button
+          className="next-turn-button"
+          onClick={nextTurn}
+          style={{
+            padding: '12px 40px',
+            fontSize: '1.2rem',
+            fontWeight: 700,
+            borderRadius: 'var(--radius-lg)',
+            background: 'linear-gradient(135deg, var(--color-success), #059669)',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: 'var(--shadow-lg)',
+            transition: 'all 0.2s'
+          }}
+          onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px) scale(1.05)'}
+          onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0) scale(1)'}
+        >
+          ⚔️ FIGHT ⚔️
         </button>
       </div>
 
-      <div className="battle-container">
+      <div className="battle-container" style={{ position: 'relative' }}>
         {state.players.map((p, i) => {
           const active = p.bench[p.activeIndex]
           const hpPercent = (active.currentHp / active.maxHp) * 100
@@ -278,6 +348,84 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                 <span className="points-badge">⭐ {p.points} Points</span>
               </div>
 
+              {/* Super Move Gauge */}
+              <div className="super-move-container" style={{ margin: '10px 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '2px' }}>
+                  <span>SUPER GAUGE</span>
+                  <span>{p.superMoveGauge || 0}%</span>
+                </div>
+                <div style={{ height: '8px', background: '#333', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div style={{
+                    width: `${p.superMoveGauge || 0}%`,
+                    height: '100%',
+                    background: 'linear-gradient(90deg, #ff0080, #ff8c00)',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+              </div>
+
+              {/* POKÉMON DISPLAY - MOVED HERE TO SHOW FIRST */}
+              <div className="active-pokemon">
+                <div className="active-pokemon-name">{active.pokemon.name}</div>
+                <div className="pokemon-types">
+                  {active.pokemon.types.map(t => (
+                    <span key={t} className={`type-badge type-${t.toLowerCase()}`}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+                <div className="active-pokemon-sprite-container">
+                  <img
+                    src={active.pokemon.sprite}
+                    alt={active.pokemon.name}
+                    className={`active-pokemon-sprite ${active.fainted ? 'fainted' : ''} ${actions[i]?.kind === 'attack' ? 'attacking' : ''}`}
+                  />
+                  {/* Status Overlay */}
+                  {active.status && (
+                    <div className="status-overlay" style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      fontSize: '2rem',
+                      filter: 'drop-shadow(0 0 2px black)'
+                    }}>
+                      {getStatusIcon(active.status)}
+                    </div>
+                  )}
+                </div>
+
+                <div className="hp-bar-container">
+                  <div className="hp-label">
+                    <span>HP</span>
+                    <span>
+                      {Math.max(0, active.currentHp)}/{active.maxHp}
+                    </span>
+                  </div>
+                  <div className="hp-bar">
+                    <div
+                      className={`hp-fill ${hpClass}`}
+                      style={{ width: `${Math.max(0, hpPercent)}%` }}
+                    >
+                      {hpPercent > 10 && `${Math.round(hpPercent)}%`}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pokemon-types">
+                  {active.pokemon.types.map(t => (
+                    <span key={t} className={`type-badge type-${t.toLowerCase()}`}>
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                {active.shielded && <div className="condition-badge condition-shield">🛡️ Shielded</div>}
+                {active.boostedAtkTurns && active.boostedAtkTurns > 0 && (
+                  <div className="condition-badge condition-boost">⚡ Boosted ({active.boostedAtkTurns} turns)</div>
+                )}
+              </div>
+
+              {/* MOVES AND ACTIONS - NOW BELOW POKÉMON */}
               <div className="action-panel">
                 <div className="move-buttons">
                   {active.pokemon.moves.map((m, mi) => {
@@ -329,6 +477,23 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                   >
                     🔄 Switch
                   </button>
+
+
+                  {/* Super Move Button */}
+                  <button
+                    className={`action-button super-move ${actions[i]?.kind === 'super_move' ? 'selected' : ''}`}
+                    onClick={() => pickAction(i, { kind: 'super_move' })}
+                    disabled={active.fainted || (p.superMoveGauge || 0) < 100}
+                    style={{
+                      background: (p.superMoveGauge || 0) >= 100 ? 'linear-gradient(45deg, #ff00cc, #333399)' : '#555',
+                      gridColumn: 'span 3',
+                      marginTop: '5px',
+                      border: (p.superMoveGauge || 0) >= 100 ? '2px solid #fff' : 'none',
+                      boxShadow: (p.superMoveGauge || 0) >= 100 ? '0 0 10px #ff00cc' : 'none'
+                    }}
+                  >
+                    {(p.superMoveGauge || 0) >= 100 ? '🌟 ULTIMATE MOVE 🌟' : `⚡ Super: ${p.superMoveGauge || 0}%`}
+                  </button>
                 </div>
 
                 <div className="card-actions">
@@ -362,48 +527,6 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                 )}
               </div>
 
-              <div className="active-pokemon">
-                <div className="active-pokemon-name">{active.pokemon.name}</div>
-                <div className="pokemon-types">
-                  {active.pokemon.types.map(t => (
-                    <span key={t} className={`type-badge type-${t.toLowerCase()}`}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-                <img src={active.pokemon.sprite} alt={active.pokemon.name} />
-
-                <div className="hp-bar-container">
-                  <div className="hp-label">
-                    <span>HP</span>
-                    <span>
-                      {Math.max(0, active.currentHp)}/{active.maxHp}
-                    </span>
-                  </div>
-                  <div className="hp-bar">
-                    <div
-                      className={`hp-fill ${hpClass}`}
-                      style={{ width: `${Math.max(0, hpPercent)}%` }}
-                    >
-                      {hpPercent > 10 && `${Math.round(hpPercent)}%`}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pokemon-types">
-                  {active.pokemon.types.map(t => (
-                    <span key={t} className={`type-badge type-${t.toLowerCase()}`}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
-
-                {active.shielded && <div className="condition-badge condition-shield">🛡️ Shielded</div>}
-                {active.boostedAtkTurns && active.boostedAtkTurns > 0 && (
-                  <div className="condition-badge condition-boost">⚡ Boosted ({active.boostedAtkTurns} turns)</div>
-                )}
-              </div>
-
               <div className="bench-section">
                 <h5>Bench ({p.bench.filter((pk, idx) => idx !== p.activeIndex).length} available)</h5>
                 <div className="bench-pokemon">
@@ -426,7 +549,10 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
                           </span>
                         ))}
                       </div>
-                      <div className="bench-pokemon-name">{pp.pokemon.name}</div>
+                      <div className="bench-pokemon-name">
+                        {pp.pokemon.name}
+                        {pp.status && <span style={{ marginLeft: '4px' }}>{getStatusIcon(pp.status)}</span>}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -447,79 +573,99 @@ export default function BattleScreen({ initialState, onExit, unselectedPools }: 
         </div>
       </div>
 
-      {showResult && (
-        <div className="help-modal">
-          <div className="help-content" style={{ maxWidth: '600px' }}>
-            <h2>Turn {state.turnNumber - 1} Results</h2>
-            <div className="battle-log" style={{ maxHeight: '300px', marginBottom: '20px' }}>
-              {lastLogs.map((l, idx) => {
-                const isSuperEffective = l.includes('Super Effective')
-                const isNotVeryEffective = l.includes('Not very effective')
-                const isDodged = l.includes('dodged')
-                const isHealed = l.includes('Heal') || l.includes('healed') || l.includes('Revive') || l.includes('revived')
-                const isKO = l.includes('KO') || l.includes('fainted')
-                
-                return (
-                  <div 
-                    key={idx} 
-                    className={`log-entry ${getLogEntryClass(l)}`}
-                    style={
-                      isSuperEffective ? { 
-                        backgroundColor: 'rgba(255, 107, 107, 0.3)', 
-                        borderLeft: '4px solid #ff6b6b' 
-                      } : isNotVeryEffective ? {
-                        backgroundColor: 'rgba(150, 150, 150, 0.3)', // Lighter background for dark mode
-                        borderLeft: '4px solid #999' // Lighter border for dark mode
-                      } : {}
-                    }
-                  >
-                    {isSuperEffective ? '💥 ' : isDodged ? '💨 ' : isHealed ? '✨ ' : isKO ? '💀 ' : ''}
-                    {l}
+      {
+        showResult && (
+          <div className="help-modal">
+            <div className="help-content" style={{
+              maxWidth: '600px',
+              backgroundColor: 'var(--theme-surface)',
+              color: 'var(--theme-text)',
+              border: '2px solid var(--theme-border)'
+            }}>
+              <h2>Turn {state.turnNumber - 1} Results</h2>
+              <div className="battle-log" style={{
+                maxHeight: '300px',
+                marginBottom: '20px',
+                backgroundColor: 'var(--theme-background)',
+                border: '1px solid var(--theme-border)'
+              }}>
+                {lastLogs.map((l, idx) => {
+                  const isSuperEffective = l.includes('Super Effective')
+                  const isNotVeryEffective = l.includes('Not very effective')
+                  const isDodged = l.includes('dodged')
+                  const isHealed = l.includes('Heal') || l.includes('healed') || l.includes('Revive') || l.includes('revived')
+                  const isKO = l.includes('KO') || l.includes('fainted')
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`log-entry ${getLogEntryClass(l)}`}
+                      style={
+                        isSuperEffective ? {
+                          backgroundColor: 'rgba(var(--theme-danger-rgb), 0.1)',
+                          borderLeft: '4px solid var(--theme-danger)',
+                          color: 'var(--theme-text)'
+                        } : isNotVeryEffective ? {
+                          backgroundColor: 'rgba(var(--theme-text-secondary-rgb), 0.1)',
+                          borderLeft: '4px solid var(--theme-text-secondary)',
+                          color: 'var(--theme-text)'
+                        } : {
+                          color: 'var(--theme-text)'
+                        }
+                      }
+                    >
+                      {isSuperEffective ? '💥 ' : isDodged ? '💨 ' : isHealed ? '✨ ' : isKO ? '💀 ' : ''}
+                      {l}
+                    </div>
+                  )
+                })}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                {state.players.map((p, idx) => (
+                  <div key={p.id} style={{
+                    background: 'var(--theme-background)',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    color: 'var(--theme-text)',
+                    border: '1px solid var(--theme-border)'
+                  }}>
+                    <div style={{ fontWeight: '600', marginBottom: '8px' }}>{p.name}</div>
+                    <div>⭐ Points: <strong>{p.points}</strong></div>
+                    <div>❤️ HP: <strong>{Math.max(0, Math.floor(p.bench.reduce((sum, pk) => sum + (pk.fainted ? 0 : pk.currentHp), 0)))}</strong></div>
                   </div>
-                )
-              })}
+                ))}
+              </div>
+              <button
+                onClick={continueAfterResult}
+                style={{ width: '100%', padding: '12px', fontSize: '1rem' }}
+              >
+                Continue Battle
+              </button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
-              {state.players.map((p, idx) => (
-                <div key={p.id} style={{
-                  background: '#f8f9fa',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  fontSize: '0.9rem'
-                }}>
-                  <div style={{ fontWeight: '600', marginBottom: '8px' }}>{p.name}</div>
-                  <div>⭐ Points: <strong>{p.points}</strong></div>
-                  <div>❤️ HP: <strong>{Math.max(0, Math.floor(p.bench.reduce((sum, pk) => sum + (pk.fainted ? 0 : pk.currentHp), 0)))}</strong></div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={continueAfterResult}
-              style={{ width: '100%', padding: '12px', fontSize: '1rem' }}
-            >
-              Continue Battle
-            </button>
           </div>
-        </div>
-      )}
+        )
+      }
 
 
       {/* Power-up effects */}
-      {powerUpEffects.map(effect => (
-        <PowerUpEffect
-          key={effect.id}
-          visible={true}
-          type={effect.type as any}
-          position={effect.position}
-        />
-      ))}
-      
+      {
+        powerUpEffects.map(effect => (
+          <PowerUpEffect
+            key={effect.id}
+            visible={true}
+            type={effect.type as any}
+            position={effect.position}
+          />
+        ))
+      }
+
       {/* Battle entry animations */}
       <BattleEntryAnimation
         visible={battleEntry.visible}
         pokemon={battleEntry.pokemon}
         onComplete={() => setBattleEntry({ visible: false, pokemon: null })}
       />
-    </div>
+    </div >
   )
 }

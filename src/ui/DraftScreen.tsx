@@ -56,21 +56,29 @@ export default function DraftScreen({ onComplete }: DraftScreenProps) {
 
   if (loading) {
     return (
-      <div className="pool-section" style={{ textAlign: 'center', padding: '40px' }}>
-        <h2>Loading Pokémon...</h2>
-        <p>Getting the best fighters for you...</p>
-        <div style={{ marginTop: '20px', fontSize: '2rem' }}>⚡</div>
+      <div className="pool-section" style={{ textAlign: 'center', padding: '60px 20px' }}>
+        <div className="pokeball-loader">
+          <div className="pokeball">
+            <div className="pokeball-top"></div>
+            <div className="pokeball-middle"></div>
+            <div className="pokeball-bottom"></div>
+            <div className="pokeball-button"></div>
+          </div>
+        </div>
+        <h2 style={{ marginTop: '30px', marginBottom: '10px' }}>Loading Pokémon...</h2>
+        <p style={{ color: 'var(--theme-text-secondary)' }}>Gathering fighters from around the world...</p>
       </div>
     )
   }
 
   return (
-    <div>
-      <h2 style={{ color: 'var(--color-text)', textAlign: 'center', marginBottom: '30px' }}>⚔️ Draft Your Team</h2>
-      <div className="draft-container">
+    <div className="draft-screen-container">
+      <h2 className="draft-title">⚔️ Draft Your Team</h2>
+
+      <div className="draft-grid">
         {players.map((player, playerIdx) => (
-          <div key={player.id} className="player-section">
-            <h3>
+          <div key={player.id} className="draft-player-section">
+            <div className="draft-player-header">
               <input
                 type="text"
                 value={playerIdx === 0 ? player1Name : player2Name}
@@ -81,79 +89,84 @@ export default function DraftScreen({ onComplete }: DraftScreenProps) {
                 className="player-name-input"
                 aria-label={`Player ${playerIdx + 1} Name`}
               />
-            </h3>
-            <div style={{ marginBottom: '15px', fontSize: '1.1rem', fontWeight: '600', color: 'var(--color-primary)' }}>
-              Selected: {player.picks.length}/6
-            </div>
-            <div className="selected-pokemon-row">
-              {player.picks.map(p => (
-                <div key={p.id} className="bench-pokemon-card">
-                  <img src={p.sprite} alt={p.name} />
-                  <div className="bench-pokemon-types">
-                    {p.types.map((t: string) => (
-                      <span key={t} className={`type-badge-small type-${t.toLowerCase()}`} title={t}>
-                        {t.charAt(0).toUpperCase()}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="bench-pokemon-name">{p.name}</div>
-                </div>
-              ))}
+              <div className={`draft-counter ${player.picks.length === 6 ? 'complete' : ''}`}>
+                {player.picks.length}/6 Ready
+              </div>
             </div>
 
-            <h4 style={{ marginTop: '20px', color: 'var(--color-text-secondary)' }}>Available for {playerIdx === 0 ? player1Name : player2Name}</h4>
-            <div className="pokemon-pool-grid">
-              {pools[playerIdx].map((p: SimplePokemon) => (
-                <div
-                  key={p.id}
-                  className={`pool-pokemon-card ${isPicked(playerIdx, p.id) ? 'disabled' : ''}`}
-                  style={{ opacity: isPicked(playerIdx, p.id) ? 0.5 : 1 }}
-                >
-                  <img src={p.sprite} alt={p.name} />
-                  <div className="pokemon-card-name">{p.name}</div>
-                  <div className="pokemon-types">
-                    {p.types.map((t: string) => (
-                      <span key={t} className={`type-badge type-${t.toLowerCase()}`}>
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                  <button
-                    className="pick-button"
-                    onClick={() => pickPokemon(playerIdx, p)}
-                    disabled={player.picks.length >= 6 || isPicked(playerIdx, p.id)}
-                  >
-                    {isPicked(playerIdx, p.id) ? '✓ Picked' : 'Pick'}
-                  </button>
-                  {isPicked(playerIdx, p.id) && (
-                    <button
-                      className="unpick-button"
-                      onClick={() => unpickPokemon(playerIdx, p.id)}
-                      style={{ marginLeft: '5px' }}
+            <div className="selected-team-container">
+              <div className="selected-team-label">Your Squad</div>
+              <div className="selected-team-slots">
+                {Array.from({ length: 6 }).map((_, i) => {
+                  const pick = player.picks[i]
+                  return (
+                    <div key={i} className={`team-slot ${pick ? 'filled' : 'empty'}`}>
+                      {pick ? (
+                        <>
+                          <button
+                            className="remove-pick-btn"
+                            onClick={() => unpickPokemon(playerIdx, pick.id)}
+                            title="Remove"
+                          >✕</button>
+                          <img src={pick.sprite} alt={pick.name} className="slot-sprite" />
+                          <div className="slot-name">{pick.name}</div>
+                        </>
+                      ) : (
+                        <div className="empty-slot-indicator">{i + 1}</div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="available-pool-section">
+              <h4 className="pool-label">Available Recruits</h4>
+              <div className="pokemon-pool-grid">
+                {pools[playerIdx].map((p: SimplePokemon) => {
+                  const picked = isPicked(playerIdx, p.id)
+                  return (
+                    <div
+                      key={p.id}
+                      className={`pool-card ${picked ? 'picked' : ''}`}
+                      onClick={() => !picked && player.picks.length < 6 && pickPokemon(playerIdx, p)}
                     >
-                      ✕ Unpick
-                    </button>
-                  )}
-                </div>
-              ))}
+                      <div className="pool-card-inner">
+                        <img src={p.sprite} alt={p.name} className="pool-sprite" />
+                        <div className="pool-info">
+                          <div className="pool-name">{p.name}</div>
+                          <div className="pool-types">
+                            {p.types.map((t: string) => (
+                              <span key={t} className={`type-dot type-${t.toLowerCase()}`} title={t} />
+                            ))}
+                          </div>
+                        </div>
+                        {picked && <div className="picked-overlay">✓</div>}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="start-game-section">
+      <div className="start-game-bar">
         <button
+          className={`start-battle-btn ${players[0].picks.length === 6 && players[1].picks.length === 6 ? 'ready' : 'disabled'}`}
           onClick={() => {
             if (players[0].picks.length === 6 && players[1].picks.length === 6) {
               const unselected1 = pools[0].filter(p => !players[0].picks.some(pick => pick.id === p.id))
               const unselected2 = pools[1].filter(p => !players[1].picks.some(pick => pick.id === p.id))
               onComplete(players[0], players[1], unselected1, unselected2)
             }
-            else alert('Both players must pick 6 Pokémon!')
           }}
-          style={{ padding: '14px 40px', fontSize: '1.1rem' }}
+          disabled={players[0].picks.length !== 6 || players[1].picks.length !== 6}
         >
-          ⚡ Start Battle ⚡
+          {players[0].picks.length === 6 && players[1].picks.length === 6
+            ? '⚡ START BATTLE ⚡'
+            : 'Waiting for both players...'}
         </button>
       </div>
     </div>

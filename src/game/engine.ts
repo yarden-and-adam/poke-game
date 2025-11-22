@@ -1,6 +1,6 @@
-import { Player, PlayerState, GameState, ActionType, PokemonState, TypeChart } from '../types'
+import { Player, PlayerState, GameState, ActionType, PokemonState, TypeChart, BattleEvent, SimplePokemon, SimpleMove } from '../types'
 import { createDeck, drawDeck } from './deck'
-import { calculateDamage, accuracyCheck, dodgeCheck, blockDamage } from './battleEngine'
+import { calculateDamage, accuracyCheck, dodgeCheck, blockDamage, checkStatusEffects, getStatusDamage } from './battleEngine'
 import { fetchPokemonByNameOrId } from '../services/pokeapi'
 
 export function buildGameState(
@@ -21,6 +21,9 @@ export function buildGameState(
       fainted: false,
       shielded: false,
       boostedAtkTurns: 0,
+      friendship: 0,
+      timesUsed: 0,
+      stats: p.stats
     })),
     pokemonPool: unselectedPool1.map(p => ({
       pokemon: p,
@@ -29,10 +32,16 @@ export function buildGameState(
       fainted: false,
       shielded: false,
       boostedAtkTurns: 0,
+      friendship: 0,
+      timesUsed: 0,
+      stats: p.stats
     })),
     activeIndex: 0,
     hand: [],
     points: 0,
+    comboType: null,
+    comboCount: 0,
+    superMoveGauge: 0
   }
   const p2State: PlayerState = {
     id: player2.id,
@@ -44,6 +53,9 @@ export function buildGameState(
       fainted: false,
       shielded: false,
       boostedAtkTurns: 0,
+      friendship: 0,
+      timesUsed: 0,
+      stats: p.stats
     })),
     pokemonPool: unselectedPool2.map(p => ({
       pokemon: p,
@@ -52,10 +64,16 @@ export function buildGameState(
       fainted: false,
       shielded: false,
       boostedAtkTurns: 0,
+      friendship: 0,
+      timesUsed: 0,
+      stats: p.stats
     })),
     activeIndex: 0,
     hand: [],
     points: 0,
+    comboType: null,
+    comboCount: 0,
+    superMoveGauge: 0
   }
 
   // draw initial hands
@@ -72,6 +90,8 @@ export function buildGameState(
     players: [p1State, p2State],
     deck,
     turnNumber: 1,
+    weather: 'clear',
+    weatherTurnsRemaining: 0
   }
 }
 
@@ -79,8 +99,9 @@ export async function resolveTurn(
   state: GameState,
   actions: [ActionType | null, ActionType | null],
   typeChart: TypeChart
-): Promise<{ newState: GameState; logs: string[] }> {
+): Promise<{ newState: GameState; logs: string[]; events: BattleEvent[] }> {
   const logs: string[] = []
+  const events: BattleEvent[] = []
   // deep copy
   const s: GameState = JSON.parse(JSON.stringify(state))
 
@@ -119,7 +140,7 @@ export async function resolveTurn(
         const target = s.players[i].bench[targetIndex]
         switch (card.type) {
           case 'heal': {
-            const heal = Math.max(1, Math.floor(target.maxHp * (card.value || 0.3)))
+            const heal = Math.max(1, Math.floor(target.maxHp * (Number(card.value) || 0.3)))
             target.currentHp = Math.min(target.maxHp, target.currentHp + heal)
             logs.push(`${s.players[i].name} used ${card.name} on ${target.pokemon.name} healed ${heal}`)
             break
@@ -127,7 +148,7 @@ export async function resolveTurn(
           case 'revive': {
             if (target.fainted) {
               target.fainted = false
-              target.currentHp = Math.max(1, Math.floor(target.maxHp * (card.value || 0.5)))
+              target.currentHp = Math.max(1, Math.floor(target.maxHp * (Number(card.value) || 0.5)))
               logs.push(`${s.players[i].name} revived ${target.pokemon.name}`)
             } else logs.push(`${card.name} failed: target wasn't fainted`)
             break
@@ -139,12 +160,12 @@ export async function resolveTurn(
             break
           }
           case 'boost': {
-            target.boostedAtkTurns = (target.boostedAtkTurns || 0) + (card.value || 2)
+            target.boostedAtkTurns = (target.boostedAtkTurns || 0) + (Number(card.value) || 2)
             logs.push(`${s.players[i].name} used ${card.name} on ${target.pokemon.name}`)
             break
           }
           case 'draw': {
-            const drawn = drawDeck(s.deck, card.value || 1)
+            const drawn = drawDeck(s.deck, Number(card.value) || 1)
             s.deck = drawn.deck
             s.players[i].hand = [...s.players[i].hand, ...drawn.drawn]
             logs.push(`${s.players[i].name} used ${card.name} and drew ${drawn.drawn.length} cards`)
@@ -194,6 +215,9 @@ export async function resolveTurn(
           fainted: currentPokemonState.fainted,
           shielded: currentPokemonState.shielded,
           boostedAtkTurns: currentPokemonState.boostedAtkTurns,
+          friendship: currentPokemonState.friendship,
+          timesUsed: currentPokemonState.timesUsed,
+          stats: evolvedPokemon.stats
         }
         s.players[i].bench[benchIndex] = newPokemonState
         logs.push(`${currentPokemonState.pokemon.name} evolved into ${evolvedPokemon.name}!`)
@@ -207,17 +231,21 @@ export async function resolveTurn(
       logs.push(`${s.players[i].name} used Block`)
     } else if (action.kind === 'dodge') {
       logs.push(`${s.players[i].name} used Dodge`) // effect will be evaluated when attacked
+    } else if (action.kind === 'super_move') {
+      // Super move will be handled in attack phase, but we need to reset gauge here or there.
+      // Let's mark it.
+      logs.push(`${s.players[i].name} is preparing a SUPER MOVE!`)
     }
   }
 
   // 2. Attack resolution: gather attack orders
-  type AttackOrder = { pIdx: number; moveIndex: number }
+  type AttackOrder = { pIdx: number; moveIndex: number; isSuper?: boolean }
   const orders: AttackOrder[] = []
   for (let i = 0; i < 2; i++) {
     const action = actions[i]
     if (!action) continue
-    if (action.kind === 'attack') {
-      orders.push({ pIdx: i, moveIndex: action.moveIndex })
+    if (action.kind === 'attack' || action.kind === 'super_move') {
+      orders.push({ pIdx: i, moveIndex: action.kind === 'attack' ? action.moveIndex : -1, isSuper: action.kind === 'super_move' })
     }
   }
 
@@ -237,7 +265,7 @@ export async function resolveTurn(
 
     // skip if attacker fainted or just switched
     if (attacker.fainted) {
-      logs.push(`${attacker.pokemon.name} cannot attack (fainted)`) 
+      logs.push(`${attacker.pokemon.name} cannot attack (fainted)`)
       continue
     }
     if (justSwitched[ord.pIdx]) {
@@ -245,28 +273,63 @@ export async function resolveTurn(
       continue
     }
 
-    const move = attacker.pokemon.moves[ord.moveIndex]
+    // Check for status effects preventing move
+    const statusCheck = checkStatusEffects(attacker.pokemon, attacker.status || null)
+    if (!statusCheck.canMove) {
+      logs.push(statusCheck.message || `${attacker.pokemon.name} cannot move!`)
+      // Even if they can't move, they might take damage from status later
+      continue
+    } else if (statusCheck.message) {
+      logs.push(statusCheck.message)
+    }
+
+    let move: SimpleMove
+    let isSuper = false
+
+    if (ord.isSuper) {
+      // Create a temporary super move
+      move = {
+        id: 999,
+        name: 'SUPER MOVE',
+        type: 'normal', // Neutral type or maybe attacker's type? Let's use attacker's first type
+        power: 150,
+        accuracy: 100,
+        damageClass: 'physical', // Mixed?
+        effect: 'super'
+      }
+      // Reset gauge
+      attackerPlayer.superMoveGauge = 0
+      isSuper = true
+      logs.push(`${attackerPlayer.name} unleashed their Ultimate Move!`)
+    } else {
+      move = attacker.pokemon.moves[ord.moveIndex]
+    }
+
     if (!move) {
-      logs.push(`${attackerPlayer.name} tried to use an invalid move`) 
+      logs.push(`${attackerPlayer.name} tried to use an invalid move`)
       continue
     }
 
-    if (!accuracyCheck(move)) {
+    if (!isSuper && !accuracyCheck(move)) {
       logs.push(`${attacker.pokemon.name} tried to use ${move.name} but missed!`)
       continue
     }
 
     // Shade dodge: if defender had 'dodge' action
     const defenderAction = actions[ord.pIdx === 0 ? 1 : 0]
-    if (defenderAction && defenderAction.kind === 'dodge') {
+    if (!isSuper && defenderAction && defenderAction.kind === 'dodge') {
       if (dodgeCheck(attacker.pokemon, defender.pokemon)) {
         logs.push(`${defender.pokemon.name} dodged ${move.name} from ${attacker.pokemon.name}`)
         continue
       }
     }
 
-    let dmgData = calculateDamage(attacker.pokemon, defender.pokemon, move, typeChart)
+    let dmgData = calculateDamage(attacker.pokemon, defender.pokemon, move, typeChart, s.weather, defender.status || null)
     let dmg = dmgData.damage
+
+    // Super move multiplier (already high power, but let's ensure it feels strong)
+    if (isSuper) dmg = Math.floor(dmg * 1.5)
+
     // apply boosted atk (if any) as +20% per boost turn
     if ((attacker.boostedAtkTurns || 0) > 0) dmg = Math.floor(dmg * 1.2)
 
@@ -284,6 +347,62 @@ export async function resolveTurn(
     defender.currentHp = Math.max(0, defender.currentHp - dmg)
     logs.push(`${attacker.pokemon.name} used ${move.name} on ${defender.pokemon.name} dealing ${dmg} (HP left ${defender.currentHp}/${defender.maxHp})`)
 
+    // Update Super Move Gauge
+    // Attacker gains 10% for dealing damage
+    attackerPlayer.superMoveGauge = Math.min(100, (attackerPlayer.superMoveGauge || 0) + 10)
+    // Defender gains 5% for taking damage
+    defenderPlayer.superMoveGauge = Math.min(100, (defenderPlayer.superMoveGauge || 0) + 5)
+
+    // Apply Status
+    if (dmgData.appliedStatus && !defender.status && !defender.fainted) {
+      defender.status = dmgData.appliedStatus
+      defender.statusTurnsRemaining = 3 // Default duration
+      logs.push(`${defender.pokemon.name} was ${dmgData.appliedStatus}!`)
+      events.push({
+        type: 'status_apply',
+        message: `${defender.pokemon.name} is ${dmgData.appliedStatus}!`,
+        targetPlayerIndex: ord.pIdx === 0 ? 1 : 0,
+        targetPokemonIndex: defenderPlayer.activeIndex
+      })
+    }
+
+    // Generate events
+    if (isSuper) {
+      events.push({
+        type: 'super_move',
+        message: 'SUPER MOVE!',
+        targetPlayerIndex: ord.pIdx === 0 ? 1 : 0,
+        targetPokemonIndex: defenderPlayer.activeIndex
+      })
+    }
+    if (dmgData.details.isCritical) {
+      events.push({
+        type: 'critical',
+        message: 'CRITICAL HIT!',
+        targetPlayerIndex: ord.pIdx === 0 ? 1 : 0,
+        targetPokemonIndex: defenderPlayer.activeIndex
+      })
+    }
+    if (dmgData.details.typeEff > 1) {
+      events.push({
+        type: 'effective',
+        message: 'SUPER EFFECTIVE!',
+        targetPlayerIndex: ord.pIdx === 0 ? 1 : 0,
+        targetPokemonIndex: defenderPlayer.activeIndex
+      })
+    } else if (dmgData.details.typeEff < 1 && dmgData.details.typeEff > 0) {
+      // Optional: Not very effective
+    }
+
+    if (defenderAction && defenderAction.kind === 'block') {
+      events.push({
+        type: 'block',
+        message: 'BLOCKED!',
+        targetPlayerIndex: ord.pIdx === 0 ? 1 : 0,
+        targetPokemonIndex: defenderPlayer.activeIndex
+      })
+    }
+
     if (defender.currentHp <= 0 && !defender.fainted) {
       defender.fainted = true
       logs.push(`${defender.pokemon.name} fainted!`)
@@ -295,6 +414,46 @@ export async function resolveTurn(
       s.players[ord.pIdx].hand.push(...drawn.drawn)
       if (drawn.drawn.length > 0) {
         logs.push(`${attackerPlayer.name} drew a card for knocking out ${defender.pokemon.name}`)
+      }
+    }
+  }
+
+  // 3. End of turn status damage
+  for (let i = 0; i < 2; i++) {
+    const active = s.players[i].bench[s.players[i].activeIndex]
+    if (!active.fainted && active.status) {
+      const statusDmg = getStatusDamage(active.pokemon, active.status, active.maxHp)
+      if (statusDmg.damage > 0) {
+        active.currentHp = Math.max(0, active.currentHp - statusDmg.damage)
+        logs.push(statusDmg.message || `${active.pokemon.name} took damage from ${active.status}`)
+        events.push({
+          type: 'status_damage',
+          message: statusDmg.message || 'Status Damage',
+          targetPlayerIndex: i,
+          targetPokemonIndex: s.players[i].activeIndex
+        })
+        if (active.currentHp <= 0 && !active.fainted) {
+          active.fainted = true
+          logs.push(`${active.pokemon.name} fainted from ${active.status}!`)
+          // Opponent gets point? Usually yes.
+          const otherPlayer = s.players[i === 0 ? 1 : 0]
+          otherPlayer.points = (otherPlayer.points || 0) + 1
+        }
+      }
+
+      // Decrement status turns
+      if (active.statusTurnsRemaining) {
+        active.statusTurnsRemaining -= 1
+        if (active.statusTurnsRemaining <= 0) {
+          active.status = null
+          logs.push(`${active.pokemon.name} recovered from its status!`)
+        }
+      } else {
+        // Fallback if turns not set
+        if (Math.random() < 0.3) {
+          active.status = null
+          logs.push(`${active.pokemon.name} recovered from its status!`)
+        }
       }
     }
   }
@@ -339,5 +498,5 @@ export async function resolveTurn(
   }
 
   s.turnNumber += 1
-  return { newState: s, logs }
+  return { newState: s, logs, events }
 }

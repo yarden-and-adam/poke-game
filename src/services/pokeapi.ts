@@ -24,7 +24,9 @@ export async function fetchPokemonSimple(pokemonId: number): Promise<SimplePokem
     const r = await fetch(`${POKEAPI_BASE}/pokemon/${pokemonId}`)
     if (!r.ok) return null
     const data = await r.json()
-    const sprite = data.sprites?.other?.['official-artwork']?.front_default || data.sprites?.front_default
+    const animatedSprite = data.sprites?.versions?.['generation-v']?.['black-white']?.animated?.front_default
+    const staticSprite = data.sprites?.other?.['official-artwork']?.front_default || data.sprites?.front_default
+    const sprite = animatedSprite || staticSprite
     const types: string[] = data.types?.map((t: any) => t.type.name) || []
     const stats = {
       hp: data.stats.find((s: any) => s.stat.name === 'hp')?.base_stat || 40,
@@ -36,7 +38,8 @@ export async function fetchPokemonSimple(pokemonId: number): Promise<SimplePokem
     }
 
     // gather moves; filter those with power & damage class
-    const moveEntries = data.moves || []
+    // OPTIMIZATION: Only fetch first 10 moves to reduce API calls
+    const moveEntries = (data.moves || []).slice(0, 10)
     const candidates: Array<Promise<SimpleMove | null>> = []
     for (const m of moveEntries) {
       candidates.push(

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import DraftScreen from './ui/DraftScreen'
-import BattleScreen from './ui/BattleScreen'
+import DraftScreenV2 from './ui/DraftScreenV2'
+import BattleScreenV2 from './ui/BattleScreenV2'
 import ThemeSelector from './ui/ThemeSelector'
 import ThemeEffects from './ui/ThemeEffects'
 import { Player, SimplePokemon } from './types'
@@ -122,8 +122,8 @@ export default function App() {
       )}
 
       {phase === 'draft' && (
-        <DraftScreen
-          onComplete={(player1: Player, player2: Player, unselected1, unselected2) => {
+        <DraftScreenV2
+          onComplete={(player1: Player, player2: Player, unselected1: SimplePokemon[], unselected2: SimplePokemon[]) => {
             setLocalP1(player1)
             setLocalP2(player2)
             // build game state
@@ -135,7 +135,11 @@ export default function App() {
       )}
 
       {phase === 'battle' && gameState && (
-        <BattleScreen initialState={gameState} onExit={() => setPhase('start')} unselectedPools={unselectedPools || undefined} />
+        <BattleScreenV2
+          initialState={gameState}
+          onExit={() => setPhase('start')}
+          unselectedPools={unselectedPools || undefined}
+        />
       )}
     </div>
   )

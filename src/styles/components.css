@@ -63,8 +63,13 @@
 }
 
 @keyframes rotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .start-screen-text {
@@ -168,7 +173,7 @@
 }
 
 .close-help-button:hover {
-  background: #b91c1c;
+  background: var(--theme-danger);
   transform: scale(1.1);
 }
 
@@ -316,24 +321,77 @@
 }
 
 /* Type-specific colors */
-.type-normal { background: var(--type-normal); }
-.type-fire { background: var(--type-fire); }
-.type-water { background: var(--type-water); }
-.type-electric { background: var(--type-electric); }
-.type-grass { background: var(--type-grass); }
-.type-ice { background: var(--type-ice); }
-.type-fighting { background: var(--type-fighting); }
-.type-poison { background: var(--type-poison); }
-.type-ground { background: var(--type-ground); }
-.type-flying { background: var(--type-flying); }
-.type-psychic { background: var(--type-psychic); }
-.type-bug { background: var(--type-bug); }
-.type-rock { background: var(--type-rock); }
-.type-ghost { background: var(--type-ghost); }
-.type-dragon { background: var(--type-dragon); }
-.type-dark { background: var(--type-dark); }
-.type-steel { background: var(--type-steel); }
-.type-fairy { background: var(--type-fairy); }
+.type-normal {
+  background: var(--type-normal);
+}
+
+.type-fire {
+  background: var(--type-fire);
+}
+
+.type-water {
+  background: var(--type-water);
+}
+
+.type-electric {
+  background: var(--type-electric);
+}
+
+.type-grass {
+  background: var(--type-grass);
+}
+
+.type-ice {
+  background: var(--type-ice);
+}
+
+.type-fighting {
+  background: var(--type-fighting);
+}
+
+.type-poison {
+  background: var(--type-poison);
+}
+
+.type-ground {
+  background: var(--type-ground);
+}
+
+.type-flying {
+  background: var(--type-flying);
+}
+
+.type-psychic {
+  background: var(--type-psychic);
+}
+
+.type-bug {
+  background: var(--type-bug);
+}
+
+.type-rock {
+  background: var(--type-rock);
+}
+
+.type-ghost {
+  background: var(--type-ghost);
+}
+
+.type-dragon {
+  background: var(--type-dragon);
+}
+
+.type-dark {
+  background: var(--type-dark);
+}
+
+.type-steel {
+  background: var(--type-steel);
+}
+
+.type-fairy {
+  background: var(--type-fairy);
+}
 
 .pick-button {
   background: var(--color-success);
@@ -360,7 +418,7 @@
 }
 
 .unpick-button {
-  background: linear-gradient(135deg, var(--color-danger), #dc3545);
+  background: linear-gradient(135deg, var(--theme-danger), var(--theme-danger));
   color: white;
   border: none;
   padding: var(--spacing-xs) var(--spacing-sm);
@@ -387,19 +445,27 @@
 }
 
 .unpick-button:hover {
-  background: linear-gradient(135deg, #dc3545, #b91c1c);
+  background: linear-gradient(135deg, var(--theme-danger), var(--theme-danger));
   transform: translateY(-2px) scale(1.05);
   box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
 }
 
 @keyframes unpick-shine {
-  0% { left: -100%; }
-  50% { left: 100%; }
-  100% { left: -100%; }
+  0% {
+    left: -100%;
+  }
+
+  50% {
+    left: 100%;
+  }
+
+  100% {
+    left: -100%;
+  }
 }
 
 .pick-button:hover:not(:disabled) {
-  background: #059669;
+  background: var(--theme-success);
   transform: scale(1.05);
 }
 
@@ -435,26 +501,69 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes card-glow {
-  0% { box-shadow: var(--shadow-md); }
-  50% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.3); }
-  100% { box-shadow: var(--shadow-lg); }
+  0% {
+    box-shadow: var(--shadow-md);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
+  }
+
+  100% {
+    box-shadow: var(--shadow-lg);
+  }
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-10px); }
-  60% { transform: translateY(-5px); }
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-10px);
+  }
+
+  60% {
+    transform: translateY(-5px);
+  }
 }
 
 @keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-  20%, 40%, 60%, 80% { transform: translateX(2px); }
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-2px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(2px);
+  }
 }
 
 /* Responsive adjustments */
@@ -463,26 +572,26 @@
     grid-template-columns: 1fr;
     gap: var(--spacing-lg);
   }
-  
+
   .pokemon-pool-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: var(--spacing-sm);
   }
-  
+
   .pool-pokemon-card img {
     width: 60px;
     height: 60px;
   }
-  
+
   .help-content {
     padding: var(--spacing-lg);
     margin: var(--spacing-md);
   }
-  
+
   .start-screen {
     padding: var(--spacing-2xl) var(--spacing-md);
   }
-  
+
   .theme-toggle-button {
     top: var(--spacing-sm);
     right: var(--spacing-sm);

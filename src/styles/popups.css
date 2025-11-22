@@ -1,0 +1,74 @@
+.action-popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.action-popup.visible {
+    opacity: 1;
+    transform: translate(-50%, -80%) scale(1.2);
+}
+
+.action-popup.hiding {
+    opacity: 0;
+    transform: translate(-50%, -100%) scale(1);
+}
+
+.popup-text {
+    font-family: 'Impact', sans-serif;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 0 #000;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    white-space: nowrap;
+    animation: popup-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.type-critical .popup-text {
+    color: var(--theme-critical);
+    background: rgba(255, 255, 0, 0.9);
+    border: 3px solid var(--theme-critical);
+}
+
+.type-effective .popup-text {
+    color: var(--theme-super-effective);
+    background: rgba(0, 128, 0, 0.9);
+    border: 3px solid var(--theme-super-effective);
+}
+
+.type-block .popup-text {
+    color: var(--theme-block);
+    background: rgba(100, 100, 100, 0.9);
+    border: 3px solid var(--theme-block);
+}
+
+.type-dodge .popup-text {
+    color: var(--theme-dodge);
+    background: rgba(0, 0, 255, 0.9);
+    border: 3px solid var(--theme-dodge);
+}
+
+.type-heal .popup-text {
+    color: var(--theme-heal);
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid var(--theme-heal);
+}
+
+@keyframes popup-bounce {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}

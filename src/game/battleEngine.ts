@@ -1,4 +1,4 @@
-import { SimplePokemon, SimpleMove, TypeChart, Weather } from '../types'
+import { SimplePokemon, SimpleMove, TypeChart, Weather, StatusCondition } from '../types'
 
 function getTypeMultiplier(attackType: string, defenderTypes: string[], typeChart: TypeChart) {
   let multiplier = 1
@@ -22,6 +22,7 @@ export function calculateDamage(
   move: SimpleMove,
   typeChart: TypeChart,
   weather: Weather = 'clear',
+  defenderStatus: StatusCondition = null,
   level = 50
 ) {
   const power = move.power || 0
@@ -38,7 +39,7 @@ export function calculateDamage(
   // critical chance (simple)
   const crit = Math.random() < 0.0625 ? 1.5 : 1
   const randF = rand(0.85, 1)
-  
+
   // Weather modifiers
   let weatherMod = 1
   if (weather === 'sunny') {
@@ -50,11 +51,52 @@ export function calculateDamage(
   } else if (weather === 'stormy') {
     if (move.type === 'electric') weatherMod = 1.3
   }
-  
+
   const modifier = stab * typeEff * crit * randF * weatherMod
   const dmg = Math.max(1, Math.floor(base * modifier))
   const isCritical = crit > 1
-  return { damage: dmg, details: { stab, typeEff, crit, randF, weatherMod, isCritical } }
+
+  // Status Application Logic
+  let appliedStatus: StatusCondition = null
+  if (!defenderStatus) {
+    const randStatus = Math.random()
+    if (move.type === 'fire' && randStatus < 0.1) appliedStatus = 'burn'
+    else if (move.type === 'electric' && randStatus < 0.1) appliedStatus = 'paralyze'
+    else if (move.type === 'ice' && randStatus < 0.1) appliedStatus = 'freeze'
+    else if (move.type === 'poison' && randStatus < 0.1) appliedStatus = 'poison'
+    else if (move.type === 'psychic' && randStatus < 0.05) appliedStatus = 'sleep'
+  }
+
+  return { damage: dmg, details: { stab, typeEff, crit, randF, weatherMod, isCritical }, appliedStatus }
+}
+
+export function checkStatusEffects(pokemon: SimplePokemon, status: StatusCondition): { canMove: boolean, message?: string } {
+  if (!status) return { canMove: true }
+
+  if (status === 'freeze') {
+    if (Math.random() < 0.2) return { canMove: true, message: `${pokemon.name} thawed out!` }
+    return { canMove: false, message: `${pokemon.name} is frozen solid!` }
+  }
+  if (status === 'sleep') {
+    if (Math.random() < 0.33) return { canMove: true, message: `${pokemon.name} woke up!` }
+    return { canMove: false, message: `${pokemon.name} is fast asleep.` }
+  }
+  if (status === 'paralyze') {
+    if (Math.random() < 0.25) return { canMove: false, message: `${pokemon.name} is paralyzed! It can't move!` }
+  }
+  return { canMove: true }
+}
+
+export function getStatusDamage(pokemon: SimplePokemon, status: StatusCondition, maxHp: number): { damage: number, message?: string } {
+  if (status === 'burn') {
+    const dmg = Math.floor(maxHp * 0.0625)
+    return { damage: Math.max(1, dmg), message: `${pokemon.name} is hurt by its burn!` }
+  }
+  if (status === 'poison') {
+    const dmg = Math.floor(maxHp * 0.125)
+    return { damage: Math.max(1, dmg), message: `${pokemon.name} is hurt by poison!` }
+  }
+  return { damage: 0 }
 }
 
 export function accuracyCheck(move: SimpleMove) {

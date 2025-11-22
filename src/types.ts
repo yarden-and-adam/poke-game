@@ -110,3 +110,10 @@ export interface GameState {
   gameOver?: boolean
   winnerIndex?: number | null
 }
+
+export interface BattleEvent {
+  type: 'critical' | 'effective' | 'block' | 'dodge' | 'heal' | 'faint' | 'weather' | 'status_damage' | 'status_apply' | 'super_move'
+  message: string
+  targetPlayerIndex?: number // 0 or 1
+  targetPokemonIndex?: number
+}

@@ -19,7 +19,7 @@ export default function ThemeSelector({ onClose }: ThemeSelectorProps) {
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case 'base': return '🎨'
-      case 'seasonal': return '🎄'
+      case 'seasonal': return '🌟'
       case 'event': return '🎉'
       case 'custom': return '✨'
       default: return '🎨'
@@ -33,82 +33,83 @@ export default function ThemeSelector({ onClose }: ThemeSelectorProps) {
     return {
       background: theme.colors.background,
       primary: theme.colors.primary,
-      accent: theme.colors.accent || theme.colors.primary
+      accent: theme.colors.accent || theme.colors.primary,
+      surface: theme.colors.surface,
+      text: theme.colors.text
     }
   }
 
   return (
-    <div className="theme-selector">
+    <div className="theme-selector-container">
       <button
-        className="theme-selector-toggle"
+        className="theme-toggle-btn"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Select theme"
         aria-expanded={isOpen}
       >
-        🎨 Themes
+        <span className="icon">🎨</span>
+        <span className="label">Themes</span>
       </button>
 
       {isOpen && (
-        <div className="theme-selector-dropdown">
-          <div className="theme-selector-header">
-            <h3>Select Theme</h3>
-            <button
-              className="theme-selector-close"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close theme selector"
-            >
-              ✕
-            </button>
-          </div>
+        <>
+          <div className="theme-backdrop" onClick={() => setIsOpen(false)} />
+          <div className="theme-panel">
+            <div className="theme-panel-header">
+              <h3>Customize Look</h3>
+              <button
+                className="close-btn"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close theme selector"
+              >
+                ✕
+              </button>
+            </div>
 
-          <div className="theme-selector-grid">
-            {availableThemes.map((availableTheme) => {
-              const preview = getThemePreview(availableTheme.id)
-              const isActive = theme === availableTheme.id
-              
-              return (
-                <button
-                  key={availableTheme.id}
-                  className={`theme-option ${isActive ? 'active' : ''}`}
-                  onClick={() => handleThemeChange(availableTheme.id)}
-                  aria-label={`Select ${availableTheme.name} theme`}
-                  aria-pressed={isActive}
-                >
-                  <div className="theme-preview" style={preview}>
-                    <div className="theme-preview-header" style={{ background: preview.primary }}></div>
-                    <div className="theme-preview-body">
-                      <div className="theme-preview-accent" style={{ background: preview.accent }}></div>
-                      <div className="theme-preview-text"></div>
-                    </div>
-                  </div>
-                  <div className="theme-info">
-                    <div className="theme-name">
-                      {getCategoryIcon(availableTheme.category)} {availableTheme.name}
-                    </div>
-                    <div className="theme-category">{availableTheme.category}</div>
-                  </div>
-                  {isActive && (
-                    <div className="theme-active-indicator">✓</div>
-                  )}
-                </button>
-              )
-            })}
-          </div>
+            <div className="theme-grid">
+              {availableThemes.map((availableTheme) => {
+                const preview = getThemePreview(availableTheme.id)
+                const isActive = theme === availableTheme.id
 
-          <div className="theme-selector-footer">
-            <button
-              className="theme-auto-button"
-              onClick={() => {
-                const autoTheme = themeRegistry.getAutoTheme()
-                if (autoTheme) {
-                  handleThemeChange(autoTheme)
-                }
-              }}
-            >
-              🤖 Auto Seasonal Theme
-            </button>
+                return (
+                  <button
+                    key={availableTheme.id}
+                    className={`theme-card ${isActive ? 'active' : ''}`}
+                    onClick={() => handleThemeChange(availableTheme.id)}
+                    style={{ '--theme-accent': preview.accent } as any}
+                  >
+                    <div className="theme-preview-box" style={{ background: preview.background }}>
+                      <div className="preview-surface" style={{ background: preview.surface }}>
+                        <div className="preview-line" style={{ background: preview.text, opacity: 0.5, width: '60%' }} />
+                        <div className="preview-line" style={{ background: preview.text, opacity: 0.3, width: '40%' }} />
+                        <div className="preview-dot" style={{ background: preview.primary }} />
+                      </div>
+                    </div>
+
+                    <div className="theme-info">
+                      <span className="theme-name">
+                        {availableTheme.name}
+                      </span>
+                      {isActive && <span className="active-badge">Active</span>}
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="theme-footer">
+              <button
+                className="auto-theme-btn"
+                onClick={() => {
+                  const auto = themeRegistry.getAutoTheme()
+                  if (auto) handleThemeChange(auto)
+                }}
+              >
+                ✨ Auto-Detect Season
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   )
