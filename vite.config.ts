@@ -95,14 +95,14 @@ export default defineConfig({
         screenshots: [
           {
             src: 'screenshot-start.png',
-            sizes: '1920x1080',
+            sizes: '3840x1978',
             type: 'image/png',
             form_factor: 'wide',
             label: 'Start screen with theme selector'
           },
           {
             src: 'screenshot-draft.png',
-            sizes: '1920x1080',
+            sizes: '3840x1978',
             type: 'image/png',
             form_factor: 'wide',
             label: 'Draft your team of Pokémon'
