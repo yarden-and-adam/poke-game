@@ -8,10 +8,18 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      devOptions: {
+        enabled: true,
+        type: 'module'
+      },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,woff,woff2}'],
+        cleanupOutdatedCaches: true,
+        skipWaiting: true,
+        clientsClaim: true,
         runtimeCaching: [
           {
+            // PokeAPI - Cache first with 7-day expiration
             urlPattern: /^https:\/\/pokeapi\.co\/.*/i,
             handler: 'CacheFirst',
             options: {
@@ -22,6 +30,30 @@ export default defineConfig({
               },
               cacheableResponse: {
                 statuses: [0, 200]
+              }
+            }
+          },
+          {
+            // Images - Cache first with 30-day expiration
+            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'images-cache',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
+          },
+          {
+            // Fonts - Cache first with long expiration
+            urlPattern: /\.(?:woff|woff2|ttf|eot)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               }
             }
           }
@@ -38,6 +70,8 @@ export default defineConfig({
         scope: '/',
         start_url: '/',
         categories: ['games', 'entertainment'],
+        lang: 'en',
+        dir: 'ltr',
         icons: [
           {
             src: 'pwa-192x192.png',
@@ -56,6 +90,16 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'
+          }
+        ],
+        screenshots: [],
+        shortcuts: [
+          {
+            name: 'Start Battle',
+            short_name: 'Battle',
+            description: 'Jump straight into a battle',
+            url: '/',
+            icons: [{ src: 'pwa-192x192.png', sizes: '192x192' }]
           }
         ]
       }
